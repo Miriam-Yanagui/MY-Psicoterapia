@@ -30,14 +30,13 @@ export async function GET(request: NextRequest) {
     if (error) throw error;
     if (!data) return responseUnauthorized();
 
-    const isTemporary = data.status === "held" || data.status === "payment_pending";
-    if (isTemporary && (!data.hold_expires_at || new Date(data.hold_expires_at).getTime() <= Date.now())) {
+    if (data.status === "held" && (!data.hold_expires_at || new Date(data.hold_expires_at).getTime() <= Date.now())) {
       await supabase
         .from("appointments")
         .update({ status: "expired", hold_expires_at: null, booking_access_token_hash: null })
         .eq("id", data.id)
         .eq("booking_access_token_hash", hash)
-        .in("status", ["held", "payment_pending"])
+        .eq("status", "held")
         .lte("hold_expires_at", new Date().toISOString());
       return responseUnauthorized();
     }
@@ -76,7 +75,7 @@ export async function GET(request: NextRequest) {
       currency: data.currency,
       payment: latestPayment ? {
         id: latestPayment.id,
-        status: latestPayment.status === "approved_provisional" || latestPayment.status === "pending" || latestPayment.status === "rejected"
+        status: latestPayment.status === "approved" || latestPayment.status === "approved_provisional" || latestPayment.status === "pending" || latestPayment.status === "rejected"
           ? latestPayment.status : "processing",
       } : null,
     });

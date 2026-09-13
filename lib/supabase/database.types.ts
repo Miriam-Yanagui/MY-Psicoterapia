@@ -83,9 +83,9 @@ export type Database = {
         ]
       }
       payments: {
-        Row: { amount_minor: number; appointment_id: string; attempt_no: number; created_at: string; currency: string; external_reference: string; id: string; idempotency_key: string; processing_started_at: string | null; provider: string; provider_order_id: string | null; provider_payment_id: string | null; provider_updated_at: string | null; status: Database["public"]["Enums"]["payment_status"]; status_detail: string | null; updated_at: string }
-        Insert: { amount_minor: number; appointment_id: string; attempt_no: number; created_at?: string; currency: string; external_reference: string; id?: string; idempotency_key: string; processing_started_at?: string | null; provider?: string; provider_order_id?: string | null; provider_payment_id?: string | null; provider_updated_at?: string | null; status?: Database["public"]["Enums"]["payment_status"]; status_detail?: string | null; updated_at?: string }
-        Update: { amount_minor?: number; appointment_id?: string; attempt_no?: number; created_at?: string; currency?: string; external_reference?: string; id?: string; idempotency_key?: string; processing_started_at?: string | null; provider?: string; provider_order_id?: string | null; provider_payment_id?: string | null; provider_updated_at?: string | null; status?: Database["public"]["Enums"]["payment_status"]; status_detail?: string | null; updated_at?: string }
+        Row: { amount_minor: number; appointment_id: string; approved_at: string | null; attempt_no: number; created_at: string; currency: string; external_reference: string; id: string; idempotency_key: string; processing_started_at: string | null; provider: string; provider_order_id: string | null; provider_payment_id: string | null; provider_updated_at: string | null; status: Database["public"]["Enums"]["payment_status"]; status_detail: string | null; updated_at: string }
+        Insert: { amount_minor: number; appointment_id: string; approved_at?: string | null; attempt_no: number; created_at?: string; currency: string; external_reference: string; id?: string; idempotency_key: string; processing_started_at?: string | null; provider?: string; provider_order_id?: string | null; provider_payment_id?: string | null; provider_updated_at?: string | null; status?: Database["public"]["Enums"]["payment_status"]; status_detail?: string | null; updated_at?: string }
+        Update: { amount_minor?: number; appointment_id?: string; approved_at?: string | null; attempt_no?: number; created_at?: string; currency?: string; external_reference?: string; id?: string; idempotency_key?: string; processing_started_at?: string | null; provider?: string; provider_order_id?: string | null; provider_payment_id?: string | null; provider_updated_at?: string | null; status?: Database["public"]["Enums"]["payment_status"]; status_detail?: string | null; updated_at?: string }
         Relationships: [{ foreignKeyName: "payments_appointment_id_fkey"; columns: ["appointment_id"]; isOneToOne: false; referencedRelation: "appointments"; referencedColumns: ["id"] }]
       }
       slots: {
@@ -146,6 +146,10 @@ export type Database = {
         Args: { p_booking_access_token_hash: string; p_payment_id: string; p_provider_order_id: string | null; p_provider_payment_id: string | null; p_status: Database["public"]["Enums"]["payment_status"]; p_status_detail: string | null }
         Returns: undefined
       }
+      reconcile_mercado_pago_order: {
+        Args: { p_country_code: string | null; p_external_reference: string; p_order_status: string; p_order_status_detail: string; p_order_type: string; p_paid_amount_minor: number; p_processing_mode: string; p_provider_order_id: string; p_provider_payment_id: string; p_provider_updated_at: string | null; p_total_amount_minor: number; p_transaction_amount_minor: number; p_transaction_status: string; p_transaction_status_detail: string }
+        Returns: { appointment_id: string | null; payment_id: string | null; result_code: string | null; result_status: string }[]
+      }
       save_booking_contact: {
         Args: {
           p_booking_access_token_hash: string
@@ -169,7 +173,7 @@ export type Database = {
         | "confirmed"
         | "expired"
         | "cancelled"
-      payment_status: "created" | "submitting" | "uncertain" | "processing" | "pending" | "approved_provisional" | "rejected"
+      payment_status: "created" | "submitting" | "uncertain" | "processing" | "pending" | "approved_provisional" | "rejected" | "approved"
       slot_availability_status: "open" | "blocked" | "cancelled"
     }
     CompositeTypes: {
@@ -305,7 +309,7 @@ export const Constants = {
         "expired",
         "cancelled",
       ],
-      payment_status: ["created", "submitting", "uncertain", "processing", "pending", "approved_provisional", "rejected"],
+      payment_status: ["created", "submitting", "uncertain", "processing", "pending", "approved_provisional", "rejected", "approved"],
       slot_availability_status: ["open", "blocked", "cancelled"],
     },
   },

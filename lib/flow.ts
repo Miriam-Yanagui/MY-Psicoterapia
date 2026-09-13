@@ -10,4 +10,5 @@ export const routes = {
   orientation: "/onboarding/orientation",
   schedule: "/onboarding/schedule",
   checkout: "/onboarding/checkout",
+  confirmation: "/onboarding/confirmation",
 } as const;

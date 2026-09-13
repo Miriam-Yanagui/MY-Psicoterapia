@@ -10,6 +10,7 @@ import { PaymentSection } from "@/components/checkout/PaymentSection";
 import { useOnboarding } from "@/context/OnboardingProvider";
 import { recoverCurrentBooking, recoveredBookingState, saveBookingContact } from "@/lib/booking";
 import { routes } from "@/lib/flow";
+import { isAuthoritativelyConfirmed } from "@/lib/confirmation";
 
 type CheckoutStep = "details" | "payment";
 
@@ -29,7 +30,7 @@ export default function CheckoutPage() {
   const [contactError, setContactError] = useState<string | null>(null);
   const booking = state.booking;
   const [now, setNow] = useState<number | null>(null);
-  const [paymentConfig, setPaymentConfig] = useState<{ amountMinor: number; currency: "MXN"; status?: "processing" | "pending" | "approved_provisional" | "rejected" } | null>(null);
+  const [paymentConfig, setPaymentConfig] = useState<{ amountMinor: number; currency: "MXN"; status?: "processing" | "pending" | "approved_provisional" | "approved" | "rejected" } | null>(null);
 
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.contact.email.trim());
   const phoneValid = state.contact.phone.replace(/\D/g, "").length >= 7;
@@ -45,7 +46,7 @@ export default function CheckoutPage() {
     if (now === null) return null;
     return new Date(booking.holdExpiresAt).getTime() - now;
   }, [booking, now]);
-  const isExpired = Boolean(booking && booking.status !== "confirmed") && remainingMs !== null && remainingMs <= 0;
+  const isExpired = Boolean(booking && booking.status === "held") && remainingMs !== null && remainingMs <= 0;
   const countdown = useMemo(() => formatCountdown(remainingMs ?? 0), [remainingMs]);
 
   useEffect(() => {
@@ -62,6 +63,10 @@ export default function CheckoutPage() {
           return;
         }
         dispatch({ type: "restoreBooking", ...recoveredBookingState(current) });
+        if (isAuthoritativelyConfirmed(current)) {
+          router.replace(routes.confirmation);
+          return;
+        }
         setPaymentConfig({ amountMinor: current.amountMinor, currency: current.currency, status: current.payment?.status });
         if (current.contact && current.status === "payment_pending") setCheckoutStep("payment");
       })
@@ -73,6 +78,26 @@ export default function CheckoutPage() {
 
     return () => { active = false; };
   }, [booking, dispatch, router, state.bookingRecoveryState]);
+
+  useEffect(() => {
+    if (!booking || checkoutStep !== "payment") return;
+    let active = true;
+    const refresh = async () => {
+      try {
+        const current = await recoverCurrentBooking();
+        if (!active || !current) return;
+        if (isAuthoritativelyConfirmed(current)) {
+          dispatch({ type: "restoreBooking", ...recoveredBookingState(current) });
+          router.replace(routes.confirmation);
+          return;
+        }
+        setPaymentConfig({ amountMinor: current.amountMinor, currency: current.currency, status: current.payment?.status });
+      } catch { /* A later poll can recover from a temporary read failure. */ }
+    };
+    const id = window.setInterval(() => void refresh(), 3000);
+    void refresh();
+    return () => { active = false; window.clearInterval(id); };
+  }, [booking, checkoutStep, dispatch, router]);
 
   useEffect(() => {
     if (!booking || booking.status === "confirmed") return;

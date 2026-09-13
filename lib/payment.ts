@@ -1,4 +1,4 @@
-export type SafePaymentStatus = "processing" | "pending" | "approved_provisional" | "rejected";
+export type SafePaymentStatus = "processing" | "pending" | "approved_provisional" | "approved" | "rejected";
 export type PaymentResult = { status: SafePaymentStatus; paymentId: string; message?: string };
 export type CardPaymentSubmission = {
   token: string;
@@ -7,7 +7,7 @@ export type CardPaymentSubmission = {
   installments: number;
 };
 
-export function paymentStatusForProvider(status: string): SafePaymentStatus {
+export function paymentStatusForProvider(status: string): Exclude<SafePaymentStatus, "approved"> {
   const value = status.toLowerCase();
   if (["approved", "processed", "paid"].includes(value)) return "approved_provisional";
   if (["rejected", "cancelled", "failed"].includes(value)) return "rejected";

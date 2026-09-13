@@ -11,6 +11,7 @@ const statusCopy: Record<SafePaymentStatus, string> = {
   processing: "Estamos procesando tu pago. No cierres esta ventana.",
   pending: "Tu pago está pendiente. Conservaremos el estado de tu solicitud.",
   approved_provisional: "Recibimos el pago. Estamos esperando la confirmación definitiva.",
+  approved: "Tu pago fue confirmado. Estamos preparando los detalles de tu cita.",
   rejected: "El pago fue rechazado. Puedes intentarlo nuevamente mientras tu reserva siga vigente.",
 };
 
@@ -22,6 +23,7 @@ export function PaymentSection({ amountMinor, currency, status: initialStatus }:
   const attemptKey = useRef(crypto.randomUUID());
   const initialization = useMemo(() => ({ amount: amountMinor / 100 }), [amountMinor]);
   const customization = useMemo(() => ({ paymentMethods: { types: { included: ["credit_card", "debit_card", "prepaid_card"] as Array<"credit_card" | "debit_card" | "prepaid_card"> } } }), []);
+  const displayedStatus = initialStatus === "approved" ? "approved" : status ?? initialStatus;
   const handleSubmit = useCallback(async (form: { token: string; payment_method_id: string; installments: number }, additional?: { paymentTypeId?: string }) => {
     setError(null); setStatus("processing");
     try {
@@ -44,7 +46,7 @@ export function PaymentSection({ amountMinor, currency, status: initialStatus }:
         initialization={initialization} locale="es-MX" customization={customization}
         onSubmit={handleSubmit} onError={handleError}
       />}
-      {status && <p className={`checkout-payment-status checkout-payment-status--${status}`} role="status">{statusCopy[status]}</p>}
+      {displayedStatus && <p className={`checkout-payment-status checkout-payment-status--${displayedStatus}`} role="status">{statusCopy[displayedStatus]}</p>}
       {error && <p className="checkout-payment-status checkout-payment-status--error" role="alert">{error}</p>}
       <p className="checkout-security">Pago de ${(amountMinor / 100).toFixed(0)} {currency} procesado por Mercado Pago</p>
     </section>

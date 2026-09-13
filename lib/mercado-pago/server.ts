@@ -1,8 +1,14 @@
 import "server-only";
 import { formatAmount, paymentStatusForProvider, type CardPaymentSubmission } from "@/lib/payment";
+import { parseMercadoPagoOrder, type MercadoPagoOrderSnapshot } from "@/lib/mercado-pago/order-snapshot";
 
 export type MercadoPagoOrderInput = CardPaymentSubmission & { amountMinor: number; currency: "MXN"; payerEmail: string; externalReference: string; idempotencyKey: string };
 export type MercadoPagoOrderResult = { status: "processing" | "pending" | "approved_provisional" | "rejected"; providerOrderId: string | null; providerPaymentId: string | null; statusDetail: string | null };
+export class MercadoPagoOrderLookupError extends Error {
+  constructor(public readonly retryable: boolean) {
+    super("MERCADO_PAGO_ORDER_LOOKUP_FAILED");
+  }
+}
 
 const stringValue = (value: unknown) => typeof value === "string" || typeof value === "number" ? String(value) : null;
 
@@ -37,4 +43,26 @@ export async function createMercadoPagoOrder(input: MercadoPagoOrderInput): Prom
     providerOrderId: stringValue(raw?.id), providerPaymentId: stringValue(payment?.id),
     statusDetail: detail?.slice(0, 120) ?? (response.ok ? null : "provider_rejected"),
   };
+}
+
+export async function getMercadoPagoOrder(orderId: string): Promise<MercadoPagoOrderSnapshot> {
+  const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  if (!accessToken) throw new MercadoPagoOrderLookupError(true);
+  let response: Response;
+  try {
+    response = await fetch(`https://api.mercadopago.com/v1/orders/${encodeURIComponent(orderId)}`, {
+      headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+      cache: "no-store",
+      signal: AbortSignal.timeout(12_000),
+    });
+  } catch {
+    throw new MercadoPagoOrderLookupError(true);
+  }
+  if (!response.ok) {
+    // A signed notification can race Mercado Pago's resource propagation, so even 404 is retryable.
+    throw new MercadoPagoOrderLookupError(true);
+  }
+  const snapshot = parseMercadoPagoOrder(await response.json().catch(() => null));
+  if (!snapshot || snapshot.providerOrderId !== orderId) throw new MercadoPagoOrderLookupError(true);
+  return snapshot;
 }

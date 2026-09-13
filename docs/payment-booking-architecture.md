@@ -1,6 +1,6 @@
 # Arquitectura de pagos y reservaciones
 
-Estado: Batches 4B-1 a 4B-4 implementados. 4B-4 crea órdenes mediante Card Payment Brick y Orders API, usando las credenciales configuradas para cada despliegue; webhook, confirmación autoritativa y F12 permanecen pendientes para 4B-5.
+Estado: Batches 4B-1 a 4B-5 implementados. 4B-5 valida Webhooks de Orders, consulta la Order server-to-server y confirma payment/appointment atómicamente antes de habilitar F12.
 
 ## Implementación Batch 4B-4
 
@@ -10,6 +10,8 @@ Estado: Batches 4B-1 a 4B-4 implementados. 4B-4 crea órdenes mediante Card Paym
 - Cada intento tiene `payments.idempotency_key` propio y estable. Un lease de 30 segundos impide submits concurrentes; después de un crash o resultado incierto, el mismo intento puede reenviarse con la misma `X-Idempotency-Key` de Mercado Pago.
 - Solo un rechazo definitivo permite crear un intento nuevo. `pending`, `processing` y `approved_provisional` mantienen el appointment en `payment_pending`.
 - Solo se persisten identificadores, estados y detalles allowlisted; nunca el token efímero ni respuestas completas del proveedor.
+- Una vez iniciado un intento no terminal, `payment_pending` conserva el slot aunque venza el reloj original. Un intento incierto podría retenerlo indefinidamente; reconciliación periódica y alertas quedan para hardening posterior.
+- Solo Order y transacción `processed/accredited`, obtenidas con `GET /v1/orders/{id}`, producen `payments.status = approved` y `appointments.status = confirmed`.
 
 Regla comercial documentada, no implementada: el paciente paga $800 MXN a la cuenta Mercado Pago de Miriam. La comisión contractual futura de Eder es $200 MXN por consulta confirmada. Este batch no implementa split, marketplace, `application_fee`, liquidación ni contabilidad de esa comisión.
 
@@ -315,23 +317,22 @@ El `token` sería efímero y producido por el Brick/SDK oficial. No se persiste 
 1. Recibir `POST` en un Route Handler dedicado.
 2. Limitar tamaño y tipo del body; extraer IDs sin confiar en campos de estado del payload.
 3. Validar la firma `x-signature` y request ID conforme a la documentación vigente de Mercado Pago.
-4. Insertar `payment_webhook_events.event_key` con constraint único. Si ya existe, responder 200 sin repetir efectos.
-5. Obtener el pago por `provider_payment_id` desde Mercado Pago usando credenciales server-side.
-6. Localizar `payments` por `(provider, provider_payment_id)` o `external_reference` y validar appointment, monto, moneda y ambiente.
-7. Dentro de una transacción y con bloqueo de payment/appointment:
-   - Ignorar snapshots más antiguos que `provider_updated_at`.
+4. Obtener la Order desde Mercado Pago usando credenciales server-side y reducirla inmediatamente a un snapshot allowlisted.
+5. Localizar `payments` por `provider_order_id` o `external_reference` y validar appointment, IDs, monto y flujo online/automatic.
+6. Dentro de una transacción y con bloqueo de payment/appointment:
    - Aplicar solo transiciones monotónicas válidas.
    - Actualizar `payments.status` desde el snapshot verificado.
-   - Si está aprobado, confirmar el appointment únicamente si conserva el derecho al slot; resolver el caso tardío según la política anterior.
-   - Marcar el evento procesado.
-8. Responder 200/201 rápidamente. Los efectos secundarios se encolan o se ejecutan después de confirmar la transacción.
+   - Si está acreditado, confirmar el appointment aun si venció el reloj original, porque `payment_pending` nunca liberó el slot.
+7. Responder 200 rápidamente. Fallos temporales de proveedor/base devuelven 503 para solicitar retry.
+
+No se añade una tabla de eventos en 4B-5: `data.id` identifica el recurso, no una versión, y deduplicar una Order antes del GET podría ocultar una actualización posterior. La idempotencia reside en IDs únicos, el GET del estado actual, locks y transiciones monotónicas.
 
 Mercado Pago documenta que los webhooks pueden reintentarse si no reciben 200/201 y recomienda recuperar el recurso notificado desde su API. La duplicación es comportamiento esperado, no una excepción.
 
 ### Eventos duplicados y fuera de orden
 
-- Duplicados: `event_key` único más operaciones idempotentes.
-- Fuera de orden: comparar `provider_updated_at` y una tabla explícita de transiciones; nunca degradar `approved` a `pending` por un evento anterior.
+- Duplicados: GET autoritativo más operaciones transaccionales idempotentes.
+- Fuera de orden: cada aviso vuelve a leer el estado actual; `approved` y `confirmed` nunca se degradan.
 - Refresh: el cliente consulta `/api/bookings/:id`; no repite la creación de pago.
 - Abandono después de pagar: el webhook confirma sin depender de que el browser regrese.
 
