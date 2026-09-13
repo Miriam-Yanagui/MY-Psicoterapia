@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     const supabase = createServerSupabaseClient();
     const { data, error } = await supabase
       .from("appointments")
-      .select("id,status,hold_expires_at,email,country_code,phone,consented_at,slot:slots!inner(id,starts_at,ends_at,timezone)")
+      .select("id,status,hold_expires_at,email,country_code,phone,consented_at,amount_minor,currency,slot:slots!inner(id,starts_at,ends_at,timezone)")
       .eq("booking_access_token_hash", hash)
       .maybeSingle();
 
@@ -49,6 +49,10 @@ export async function GET(request: NextRequest) {
 
     const slot = Array.isArray(data.slot) ? data.slot[0] : data.slot;
     if (!slot) throw new Error("Missing booking slot");
+    const { data: latestPayment, error: paymentError } = await supabase.from("payments")
+      .select("id,status").eq("appointment_id", data.id)
+      .order("created_at", { ascending: false }).limit(1).maybeSingle();
+    if (paymentError) throw paymentError;
 
     return NextResponse.json({
       appointmentId: data.id,
@@ -68,6 +72,13 @@ export async function GET(request: NextRequest) {
             consented: true,
           }
         : null,
+      amountMinor: data.amount_minor,
+      currency: data.currency,
+      payment: latestPayment ? {
+        id: latestPayment.id,
+        status: latestPayment.status === "approved_provisional" || latestPayment.status === "pending" || latestPayment.status === "rejected"
+          ? latestPayment.status : "processing",
+      } : null,
     });
   } catch {
     return NextResponse.json({ code: "BOOKING_RECOVERY_UNAVAILABLE" }, { status: 503 });

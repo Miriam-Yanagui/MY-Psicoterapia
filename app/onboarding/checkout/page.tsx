@@ -29,6 +29,7 @@ export default function CheckoutPage() {
   const [contactError, setContactError] = useState<string | null>(null);
   const booking = state.booking;
   const [now, setNow] = useState<number | null>(null);
+  const [paymentConfig, setPaymentConfig] = useState<{ amountMinor: number; currency: "MXN"; status?: "processing" | "pending" | "approved_provisional" | "rejected" } | null>(null);
 
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.contact.email.trim());
   const phoneValid = state.contact.phone.replace(/\D/g, "").length >= 7;
@@ -48,7 +49,7 @@ export default function CheckoutPage() {
   const countdown = useMemo(() => formatCountdown(remainingMs ?? 0), [remainingMs]);
 
   useEffect(() => {
-    if (booking || state.bookingRecoveryState === "recovering" || state.bookingRecoveryState === "unavailable") return;
+    if (booking || state.bookingRecoveryState === "unavailable") return;
     let active = true;
     dispatch({ type: "setBookingRecoveryState", state: "recovering" });
 
@@ -61,6 +62,8 @@ export default function CheckoutPage() {
           return;
         }
         dispatch({ type: "restoreBooking", ...recoveredBookingState(current) });
+        setPaymentConfig({ amountMinor: current.amountMinor, currency: current.currency, status: current.payment?.status });
+        if (current.contact && current.status === "payment_pending") setCheckoutStep("payment");
       })
       .catch(() => {
         if (!active) return;
@@ -94,6 +97,9 @@ export default function CheckoutPage() {
         phone: state.contact.phone,
         consented: state.contact.consent,
       });
+      const current = await recoverCurrentBooking();
+      if (!current) throw Object.assign(new Error("BOOKING_NOT_FOUND"), { code: "BOOKING_NOT_FOUND" });
+      setPaymentConfig({ amountMinor: current.amountMinor, currency: current.currency, status: current.payment?.status });
       setCheckoutStep("payment");
       setContactState("idle");
     } catch (error) {
@@ -128,6 +134,6 @@ export default function CheckoutPage() {
     <Image className="checkout-continue-arrow" src="/assets/f02-arrow-right.png" alt="" width={18} height={18} />
     {contactError && <p className="checkout-privacy" role="alert">{contactError}</p>}
     {!contactError && <p className="checkout-privacy">Solo usaremos estos datos para tu cita.</p>}
-    {checkoutStep === "payment" && !isExpired && <PaymentSection />}
+    {checkoutStep === "payment" && !isExpired && paymentConfig && <PaymentSection {...paymentConfig} />}
   </main></div>;
 }

@@ -1,6 +1,17 @@
 # Arquitectura de pagos y reservaciones
 
-Estado: propuesta técnica posterior a Batch 4A. No constituye una implementación de Supabase, Mercado Pago, holds, webhooks ni F12.
+Estado: Batches 4B-1 a 4B-4 implementados. 4B-4 crea órdenes sandbox mediante Card Payment Brick y Orders API; webhook, confirmación autoritativa y F12 permanecen pendientes para 4B-5.
+
+## Implementación Batch 4B-4
+
+- F11 usa el Card Payment Brick oficial; ningún input propio captura PAN, CVV o vencimiento.
+- `POST /api/payments` autentica exclusivamente mediante la cookie de recovery y vuelve a leer appointment, hold, contacto, monto y moneda desde Postgres.
+- El monto autoritativo es `appointments.amount_minor = 80000`, moneda `MXN`.
+- Cada intento tiene `payments.idempotency_key` propio y estable. Un lease de 30 segundos impide submits concurrentes; después de un crash o resultado incierto, el mismo intento puede reenviarse con la misma `X-Idempotency-Key` de Mercado Pago.
+- Solo un rechazo definitivo permite crear un intento nuevo. `pending`, `processing` y `approved_provisional` mantienen el appointment en `payment_pending`.
+- Solo se persisten identificadores, estados y detalles allowlisted; nunca el token efímero ni respuestas completas del proveedor.
+
+Regla comercial documentada, no implementada: el paciente paga $800 MXN a la cuenta Mercado Pago de Miriam. La comisión contractual futura de Eder es $200 MXN por consulta confirmada. Este batch no implementa split, marketplace, `application_fee`, liquidación ni contabilidad de esa comisión.
 
 ## 1. Auditoría del estado actual
 
