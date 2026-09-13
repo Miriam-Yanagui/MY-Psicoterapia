@@ -22,7 +22,10 @@ export type BookingHold = {
   appointmentId: string;
   slotId: string;
   holdExpiresAt: string;
+  status?: "held" | "payment_pending" | "confirmed";
 };
+
+export type BookingRecoveryState = "idle" | "recovering" | "ready" | "unavailable";
 
 export type OnboardingState = {
   name: string;
@@ -37,6 +40,7 @@ export type OnboardingState = {
     consent: boolean;
   };
   booking: BookingHold | null;
+  bookingRecoveryState: BookingRecoveryState;
 };
 
 export type OnboardingAction =
@@ -51,5 +55,12 @@ export type OnboardingAction =
   | { type: "setContactPhone"; phone: string }
   | { type: "setContactConsent"; consent: boolean }
   | { type: "setBooking"; booking: BookingHold }
+  | {
+      type: "restoreBooking";
+      booking: BookingHold;
+      appointment: { date: string; time: string };
+      contact: OnboardingState["contact"] | null;
+    }
+  | { type: "setBookingRecoveryState"; state: BookingRecoveryState }
   | { type: "clearBooking" }
   | { type: "reset" };

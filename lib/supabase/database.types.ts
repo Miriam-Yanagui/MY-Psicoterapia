@@ -17,6 +17,7 @@ export type Database = {
       appointments: {
         Row: {
           amount_minor: number
+          booking_access_token_hash: string | null
           cancelled_at: string | null
           confirmed_at: string | null
           consent_version: string | null
@@ -35,6 +36,7 @@ export type Database = {
         }
         Insert: {
           amount_minor: number
+          booking_access_token_hash?: string | null
           cancelled_at?: string | null
           confirmed_at?: string | null
           consent_version?: string | null
@@ -53,6 +55,7 @@ export type Database = {
         }
         Update: {
           amount_minor?: number
+          booking_access_token_hash?: string | null
           cancelled_at?: string | null
           confirmed_at?: string | null
           consent_version?: string | null
@@ -115,7 +118,11 @@ export type Database = {
     }
     Functions: {
       acquire_booking_hold: {
-        Args: { p_idempotency_key: string; p_slot_id: string }
+        Args: {
+          p_booking_access_token_hash: string
+          p_idempotency_key: string
+          p_slot_id: string
+        }
         Returns: {
           appointment_id: string | null
           hold_expires_at: string | null
@@ -123,6 +130,21 @@ export type Database = {
           result_code: string | null
           result_status: string
           slot_id: string
+        }[]
+      }
+      save_booking_contact: {
+        Args: {
+          p_booking_access_token_hash: string
+          p_consent_version: string
+          p_country_code: string
+          p_email: string
+          p_phone: string
+        }
+        Returns: {
+          appointment_id: string | null
+          hold_expires_at: string | null
+          result_code: string | null
+          result_status: string
         }[]
       }
     }

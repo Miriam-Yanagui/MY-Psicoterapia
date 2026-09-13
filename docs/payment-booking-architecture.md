@@ -208,6 +208,15 @@ No es necesario conservar indefinidamente el payload completo. Si se conserva te
 
 ## 5. Estrategia de hold
 
+### Recuperación segura (Batch 4B-3)
+
+- El servidor genera 32 bytes aleatorios y entrega el secreto únicamente como cookie `miriam_booking_session` HttpOnly, `SameSite=Lax`, `Path=/` y `Secure` en producción.
+- Postgres conserva sólo el SHA-256 hexadecimal del secreto en `appointments.booking_access_token_hash`, protegido por formato e índice único. El secreto raw no se registra, no aparece en JSON y no llega a Client Components ni a Web Storage.
+- La adquisición y el replay idempotente rotan el hash dentro de la misma transacción que valida el hold. Un replay conserva el mismo appointment y devuelve una cookie nueva, sin necesitar recuperar un secreto raw previo de la base.
+- `/api/bookings/current` autoriza exclusivamente mediante cookie/hash. Conocer `appointmentId` no concede lectura ni escritura.
+- `/api/bookings/contact` valida Origin contra el host de la petición como defensa CSRF adicional a `SameSite=Lax`, normaliza email/teléfono y persiste sólo contacto y consentimiento `booking-v1` con hora del servidor.
+- Un hold vencido nunca se reactiva. Al detectarlo autoritativamente, el servidor lo marca `expired`, elimina su hash y expira la cookie; lo mismo ocurre para bookings cancelados o credenciales inválidas.
+
 ### Creación
 
 - Se crea al pulsar Continuar en F09, antes de mostrar el estado payment.

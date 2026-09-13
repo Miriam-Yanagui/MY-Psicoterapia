@@ -1,4 +1,5 @@
 import type { BookingHold } from "@/lib/types";
+import { slotDate, slotTime } from "@/lib/availability";
 
 export type HoldSuccess = {
   status: "held";
@@ -18,6 +19,14 @@ export type HoldError = {
   error: string;
   code?: string;
   status?: number;
+};
+
+export type CurrentBooking = {
+  appointmentId: string;
+  status: "held" | "payment_pending" | "confirmed";
+  holdExpiresAt: string | null;
+  slot: { id: string; startsAt: string; endsAt: string; timezone: string };
+  contact: { email: string; countryCode: string; phone: string; consented: boolean } | null;
 };
 
 export function toBookingHold(result: HoldSuccess): BookingHold {
@@ -73,6 +82,57 @@ export async function createBookingHold(params: {
 
   throw Object.assign(new Error(errorCode), {
     code: errorCode,
+    status: response.status,
+  });
+}
+
+export async function recoverCurrentBooking(): Promise<CurrentBooking | null> {
+  const response = await fetch("/api/bookings/current", { cache: "no-store" });
+  if (response.status === 401 || response.status === 404) return null;
+  if (!response.ok) throw new Error("BOOKING_RECOVERY_UNAVAILABLE");
+  return await response.json() as CurrentBooking;
+}
+
+export function recoveredBookingState(current: CurrentBooking) {
+  return {
+    booking: {
+      appointmentId: current.appointmentId,
+      slotId: current.slot.id,
+      holdExpiresAt: current.holdExpiresAt ?? new Date(0).toISOString(),
+      status: current.status,
+    },
+    appointment: {
+      date: slotDate(current.slot),
+      time: slotTime(current.slot),
+    },
+    contact: current.contact
+      ? {
+          email: current.contact.email,
+          countryCode: current.contact.countryCode,
+          phone: current.contact.phone,
+          consent: current.contact.consented,
+        }
+      : null,
+  };
+}
+
+export async function saveBookingContact(contact: {
+  email: string;
+  countryCode: string;
+  phone: string;
+  consented: boolean;
+}): Promise<void> {
+  const response = await fetch("/api/bookings/contact", {
+    method: "POST",
+    cache: "no-store",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(contact),
+  });
+  if (response.ok) return;
+
+  const payload = await response.json().catch(() => null) as { code?: string } | null;
+  throw Object.assign(new Error(payload?.code ?? "CONTACT_UNAVAILABLE"), {
+    code: payload?.code ?? "CONTACT_UNAVAILABLE",
     status: response.status,
   });
 }
