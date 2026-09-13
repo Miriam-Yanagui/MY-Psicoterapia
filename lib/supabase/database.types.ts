@@ -26,6 +26,7 @@ export type Database = {
           currency: string
           email: string | null
           hold_expires_at: string | null
+          hold_idempotency_key: string | null
           id: string
           phone: string | null
           slot_id: string
@@ -43,6 +44,7 @@ export type Database = {
           currency: string
           email?: string | null
           hold_expires_at?: string | null
+          hold_idempotency_key?: string | null
           id?: string
           phone?: string | null
           slot_id: string
@@ -60,6 +62,7 @@ export type Database = {
           currency?: string
           email?: string | null
           hold_expires_at?: string | null
+          hold_idempotency_key?: string | null
           id?: string
           phone?: string | null
           slot_id?: string
@@ -111,7 +114,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      acquire_booking_hold: {
+        Args: { p_idempotency_key: string; p_slot_id: string }
+        Returns: {
+          appointment_id: string | null
+          hold_expires_at: string | null
+          replayed: boolean
+          result_code: string | null
+          result_status: string
+          slot_id: string
+        }[]
+      }
     }
     Enums: {
       appointment_status:

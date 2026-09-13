@@ -18,6 +18,12 @@ export type Goal =
   | "Conocerme mejor"
   | "Prefiero hablarlo en sesión";
 
+export type BookingHold = {
+  appointmentId: string;
+  slotId: string;
+  holdExpiresAt: string;
+};
+
 export type OnboardingState = {
   name: string;
   emotion: Emotion | null;
@@ -30,6 +36,7 @@ export type OnboardingState = {
     phone: string;
     consent: boolean;
   };
+  booking: BookingHold | null;
 };
 
 export type OnboardingAction =
@@ -43,4 +50,6 @@ export type OnboardingAction =
   | { type: "setContactCountryCode"; countryCode: string }
   | { type: "setContactPhone"; phone: string }
   | { type: "setContactConsent"; consent: boolean }
+  | { type: "setBooking"; booking: BookingHold }
+  | { type: "clearBooking" }
   | { type: "reset" };

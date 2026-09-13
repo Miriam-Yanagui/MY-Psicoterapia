@@ -13,6 +13,7 @@ out/
 # TypeScript and test artifacts
 *.tsbuildinfo
 coverage/
+supabase/.temp/
 
 # Logs and editor files
 *.log

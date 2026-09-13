@@ -10,6 +10,7 @@ const initialState: OnboardingState = {
   goals: [],
   appointment: { date: "2026-09-16", time: "18:00" },
   contact: { email: "", countryCode: "+52", phone: "", consent: false },
+  booking: null,
 };
 
 function reducer(state: OnboardingState, action: OnboardingAction): OnboardingState {
@@ -29,15 +30,24 @@ function reducer(state: OnboardingState, action: OnboardingAction): OnboardingSt
         date: action.date,
         time: state.appointment?.date === action.date ? state.appointment.time : null,
       },
+      booking: null,
     };
     case "selectTime": {
       if (!state.appointment?.date) return state;
-      return { ...state, appointment: { ...state.appointment, time: action.time } };
+      const nextAppointment = { ...state.appointment, time: action.time };
+      const isSameSelection = state.appointment.time === action.time;
+      return {
+        ...state,
+        appointment: nextAppointment,
+        booking: isSameSelection ? state.booking : null,
+      };
     }
     case "setContactEmail": return { ...state, contact: { ...state.contact, email: action.email } };
     case "setContactCountryCode": return { ...state, contact: { ...state.contact, countryCode: action.countryCode } };
     case "setContactPhone": return { ...state, contact: { ...state.contact, phone: action.phone } };
     case "setContactConsent": return { ...state, contact: { ...state.contact, consent: action.consent } };
+    case "setBooking": return { ...state, booking: action.booking };
+    case "clearBooking": return { ...state, booking: null };
     case "reset": return initialState;
   }
 }
