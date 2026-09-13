@@ -27,6 +27,9 @@ export type CurrentBooking = {
   holdExpiresAt: string | null;
   slot: { id: string; startsAt: string; endsAt: string; timezone: string };
   contact: { email: string; countryCode: string; phone: string; consented: boolean } | null;
+  amountMinor: number;
+  currency: "MXN";
+  payment: { id: string; status: "processing" | "pending" | "approved_provisional" | "rejected" } | null;
 };
 
 export function toBookingHold(result: HoldSuccess): BookingHold {
