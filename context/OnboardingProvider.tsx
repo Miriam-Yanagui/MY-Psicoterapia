@@ -11,6 +11,7 @@ const initialState: OnboardingState = {
   appointment: { date: "2026-09-16", time: "18:00" },
   contact: { email: "", countryCode: "+52", phone: "", consent: false },
   booking: null,
+  bookingRecoveryState: "idle",
 };
 
 function reducer(state: OnboardingState, action: OnboardingAction): OnboardingState {
@@ -46,8 +47,16 @@ function reducer(state: OnboardingState, action: OnboardingAction): OnboardingSt
     case "setContactCountryCode": return { ...state, contact: { ...state.contact, countryCode: action.countryCode } };
     case "setContactPhone": return { ...state, contact: { ...state.contact, phone: action.phone } };
     case "setContactConsent": return { ...state, contact: { ...state.contact, consent: action.consent } };
-    case "setBooking": return { ...state, booking: action.booking };
-    case "clearBooking": return { ...state, booking: null };
+    case "setBooking": return { ...state, booking: action.booking, bookingRecoveryState: "ready" };
+    case "restoreBooking": return {
+      ...state,
+      booking: action.booking,
+      appointment: action.appointment,
+      contact: action.contact ?? state.contact,
+      bookingRecoveryState: "ready",
+    };
+    case "setBookingRecoveryState": return { ...state, bookingRecoveryState: action.state };
+    case "clearBooking": return { ...state, booking: null, bookingRecoveryState: "unavailable" };
     case "reset": return initialState;
   }
 }
