@@ -40,8 +40,8 @@ export function PaymentSection({ amountMinor, currency, status: initialStatus }:
   }, []);
   const handleError = useCallback(() => setError("No pudimos cargar el formulario seguro de Mercado Pago."), []);
 
-  return <><p className="checkout-expansion-intro">Completa tus datos de pago para continuar con tu reserva.</p>
-    <section className="checkout-brick" aria-label="Pago seguro con Mercado Pago">
+  return <section className="checkout-payment-flow" aria-label="Pago seguro con Mercado Pago">
+    <div className="checkout-brick">
       {!publicKey ? <p className="checkout-payment-status" role="alert">El pago no está configurado.</p> : <CardPayment
         initialization={initialization} locale="es-MX" customization={customization}
         onSubmit={handleSubmit} onError={handleError}
@@ -49,6 +49,6 @@ export function PaymentSection({ amountMinor, currency, status: initialStatus }:
       {displayedStatus && <p className={`checkout-payment-status checkout-payment-status--${displayedStatus}`} role="status">{statusCopy[displayedStatus]}</p>}
       {error && <p className="checkout-payment-status checkout-payment-status--error" role="alert">{error}</p>}
       <p className="checkout-security">Pago de ${(amountMinor / 100).toFixed(0)} {currency} procesado por Mercado Pago</p>
-    </section>
-  </>;
+    </div>
+  </section>;
 }
