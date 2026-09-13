@@ -1,6 +1,6 @@
 # Arquitectura de pagos y reservaciones
 
-Estado: Batches 4B-1 a 4B-4 implementados. 4B-4 crea órdenes sandbox mediante Card Payment Brick y Orders API; webhook, confirmación autoritativa y F12 permanecen pendientes para 4B-5.
+Estado: Batches 4B-1 a 4B-4 implementados. 4B-4 crea órdenes mediante Card Payment Brick y Orders API, usando las credenciales configuradas para cada despliegue; webhook, confirmación autoritativa y F12 permanecen pendientes para 4B-5.
 
 ## Implementación Batch 4B-4
 
@@ -462,7 +462,7 @@ Usar IDs internos, códigos de error y últimos cuatro dígitos únicamente si e
 - Añadir acceso seguro por sesión o booking token.
 - Restaurar checkout tras refresh sin persistir respuestas del cuestionario.
 
-### Batch 4B-4 · Mercado Pago sandbox
+### Batch 4B-4 · Mercado Pago Orders
 
 - Integrar Brick/SDK oficial y adaptador server-side.
 - Crear intentos e idempotency keys antes de la llamada.
