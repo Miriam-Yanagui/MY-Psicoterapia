@@ -5,7 +5,7 @@ import type { CurrentBooking } from "./booking";
 const booking = (status: CurrentBooking["status"], paymentStatus: NonNullable<CurrentBooking["payment"]>["status"]): CurrentBooking => ({
   appointmentId: "appointment", status, holdExpiresAt: null,
   slot: { id: "slot", startsAt: "2035-01-01T18:00:00Z", endsAt: "2035-01-01T18:50:00Z", timezone: "America/Mexico_City" },
-  contact: null, amountMinor: 80000, currency: "MXN", payment: { id: "payment", status: paymentStatus },
+  contact: null, amountMinor: 500, currency: "MXN", payment: { id: "payment", status: paymentStatus },
 });
 
 describe("F12 authorization", () => {

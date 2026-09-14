@@ -6,7 +6,7 @@ Estado: Batches 4B-1 a 4B-5 implementados. 4B-5 valida Webhooks de Orders, consu
 
 - F11 usa el Card Payment Brick oficial; ningún input propio captura PAN, CVV o vencimiento.
 - `POST /api/payments` autentica exclusivamente mediante la cookie de recovery y vuelve a leer appointment, hold, contacto, monto y moneda desde Postgres.
-- El monto autoritativo es `appointments.amount_minor = 80000`, moneda `MXN`.
+- El monto autoritativo se lee de `appointments.amount_minor`, moneda `MXN`. Temporalmente, para una única validación productiva, los bookings nuevos se crean con `amount_minor = 500` (MXN $5.00); los bookings anteriores conservan su monto original.
 - Cada intento tiene `payments.idempotency_key` propio y estable. Un lease de 30 segundos impide submits concurrentes; después de un crash o resultado incierto, el mismo intento puede reenviarse con la misma `X-Idempotency-Key` de Mercado Pago.
 - Solo un rechazo definitivo permite crear un intento nuevo. `pending`, `processing` y `approved_provisional` mantienen el appointment en `payment_pending`.
 - Solo se persisten identificadores, estados y detalles allowlisted; nunca el token efímero ni respuestas completas del proveedor.
@@ -148,7 +148,7 @@ Los nombres y tipos siguientes son propuesta, no SQL ejecutado.
 | `phone` | `text` | requerido antes de iniciar pago; formato normalizado, idealmente E.164 |
 | `consent_version` | `text` | versión del aviso aceptado |
 | `consented_at` | `timestamptz` | timestamp server-side |
-| `amount_minor` | `integer` | requerido; `80000` para MXN $800.00 |
+| `amount_minor` | `integer` | requerido; temporalmente `500` para MXN $5.00 en bookings nuevos |
 | `currency` | `char(3)` | requerido; `MXN` |
 | `confirmed_at` | `timestamptz` | nulo hasta confirmar |
 | `cancelled_at` | `timestamptz` | opcional |

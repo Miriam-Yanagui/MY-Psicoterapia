@@ -16,6 +16,6 @@ export default function HomePage() {
     <h1 className="f01-title">Un espacio para<br/><span>comprenderte</span><br/>y comenzar a<br/>generar cambios.</h1>
     <PrimaryButton className="f01-button" onClick={() => router.push(routes.name)}>Comenzar</PrimaryButton>
     <p className="f01-aux">4 preguntas · menos de 1 minuto · para agendar</p>
-    <p className="f01-payment">Pago con tarjeta · <strong>$800 MXN</strong> · 50 minutos</p>
+    <p className="f01-payment">Pago con tarjeta · <strong>$5 MXN</strong> · 50 minutos</p>
   </MobileScreen>;
 }
