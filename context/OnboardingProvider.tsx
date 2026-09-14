@@ -8,6 +8,7 @@ const initialState: OnboardingState = {
   emotion: null,
   therapyExperience: null,
   goals: [],
+  goalsAdditionalNotes: "",
   appointment: { date: "2026-09-16", time: "18:00" },
   contact: { email: "", countryCode: "+52", phone: "", consent: false },
   booking: null,
@@ -22,9 +23,9 @@ function reducer(state: OnboardingState, action: OnboardingAction): OnboardingSt
     case "toggleGoal": {
       const selected = state.goals.includes(action.goal);
       if (selected) return { ...state, goals: state.goals.filter((goal) => goal !== action.goal) };
-      if (state.goals.length >= 2) return state;
       return { ...state, goals: [...state.goals, action.goal] };
     }
+    case "setGoalsAdditionalNotes": return { ...state, goalsAdditionalNotes: action.notes };
     case "selectDate": return {
       ...state,
       appointment: {
