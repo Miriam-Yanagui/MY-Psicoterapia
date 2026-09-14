@@ -20,8 +20,11 @@ export default function GoalsPage() {
     <section className="f07-card" aria-labelledby="goals-title">
       <QuestionHeader>PREGUNTA 4 DE 4</QuestionHeader>
       <h1 id="goals-title">¿Qué te gustaría<br />encontrar en terapia?</h1>
-      <p className="f07-support">Elige hasta dos opciones.</p>
-      <div className="goal-options">{goals.map((goal) => { const selected = state.goals.includes(goal); return <GoalOption key={goal} value={goal} selected={selected} disabled={!selected && state.goals.length >= 2} onToggle={() => dispatch({ type: "toggleGoal", goal })} />; })}</div>
+      <div className="goal-options">{goals.map((goal) => { const selected = state.goals.includes(goal); return <GoalOption key={goal} value={goal} selected={selected} disabled={false} onToggle={() => dispatch({ type: "toggleGoal", goal })} />; })}</div>
+      <div className="f07-notes">
+        <label className="f07-notes-label" htmlFor="goals-notes">Hay algo más que quiero contar</label>
+        <textarea id="goals-notes" className="f07-notes-input" placeholder="Opcional…" value={state.goalsAdditionalNotes} onChange={(e) => dispatch({ type: "setGoalsAdditionalNotes", notes: e.target.value })} rows={3} />
+      </div>
       <PrimaryButton className="f07-button" disabled={state.goals.length === 0} onClick={() => router.push(routes.orientation)}>Continuar</PrimaryButton>
     </section>
   </MobileScreen>;

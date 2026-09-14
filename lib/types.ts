@@ -32,6 +32,7 @@ export type OnboardingState = {
   emotion: Emotion | null;
   therapyExperience: TherapyExperience | null;
   goals: Goal[];
+  goalsAdditionalNotes: string;
   appointment: { date: string | null; time: string | null } | null;
   contact: {
     email: string;
@@ -48,6 +49,7 @@ export type OnboardingAction =
   | { type: "selectEmotion"; emotion: Emotion }
   | { type: "selectExperience"; experience: TherapyExperience }
   | { type: "toggleGoal"; goal: Goal }
+  | { type: "setGoalsAdditionalNotes"; notes: string }
   | { type: "selectDate"; date: string }
   | { type: "selectTime"; time: string | null }
   | { type: "setContactEmail"; email: string }

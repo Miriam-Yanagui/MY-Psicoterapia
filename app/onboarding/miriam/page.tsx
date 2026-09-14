@@ -18,10 +18,10 @@ export default function MiriamPage() {
     <section className="f06-card" aria-labelledby="miriam-title">
       <p>HOLA, {name.toLocaleUpperCase("es-MX")}.</p>
       <h1 id="miriam-title">Soy Miriam Yanagui.</h1>
-      <p className="f06-body">Psicóloga con maestría en<br />Psicoterapia Cognitivo-Conductual.</p>
+      <p className="f06-body">Psicóloga y psicoterapeuta con maestría en<br />Psicoterapia Cognitivo-Conductual.<br /><br />Yo seré quien te acompañe<br />personalmente en este proceso.</p>
       <div className="f06-badges" aria-label="Credenciales"><span>ITESO</span><span>Cédula 13782054</span><span>TCC</span></div>
-      <PrimaryButton onClick={() => router.push(routes.testimonial)}>Continuar</PrimaryButton>
     </section>
+    <PrimaryButton className="f06-button" onClick={() => router.push(routes.testimonial)}>Continuar</PrimaryButton>
     <Image className="f06-photo" src="/assets/f02-miriam-pointing.png" alt="Miriam Yanagui" width={455} height={682} priority />
   </MobileScreen>;
 }
