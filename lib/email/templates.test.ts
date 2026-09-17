@@ -14,6 +14,7 @@ describe("transactional email templates", () => {
   it("renders the patient booking details in HTML and plain text", () => {
     const email = patientConfirmationEmail(appointment);
     expect(email.subject).toBe("Tu espacio está reservado.");
+    expect(email.html).toContain("/assets/email-celebration.gif");
     expect(email.html).toContain("$800");
     expect(email.html).toContain("Reserva 12345678AB");
     expect(email.html).toContain("Firmar acuerdo de psicoterapia");
