@@ -1,24 +1,18 @@
 import { randomBytes } from "node:crypto";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import {
   buildGoogleAuthorizationUrl,
   getGoogleOAuthConfig,
   GOOGLE_OAUTH_STATE_COOKIE,
   htmlResult,
-  secretsMatch,
 } from "@/lib/google/oauth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const config = getGoogleOAuthConfig();
-    const receivedSecret = request.nextUrl.searchParams.get("secret") ?? "";
-    if (!secretsMatch(receivedSecret, config.connectSecret)) {
-      return new NextResponse("Not found", { status: 404 });
-    }
-
     const state = randomBytes(32).toString("base64url");
     const response = NextResponse.redirect(buildGoogleAuthorizationUrl(config, state));
     response.cookies.set(GOOGLE_OAUTH_STATE_COOKIE, state, {

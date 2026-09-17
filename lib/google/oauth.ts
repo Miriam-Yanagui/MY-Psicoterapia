@@ -9,7 +9,6 @@ export type GoogleOAuthConfig = {
   clientId: string;
   clientSecret: string;
   redirectUri: string;
-  connectSecret: string;
   expectedEmail: string;
 };
 
@@ -18,15 +17,11 @@ export function getGoogleOAuthConfig(): GoogleOAuthConfig {
     clientId: (process.env.GOOGLE_CLIENT_ID ?? process.env.GOOGLE_OAUTH_CLIENT_ID)?.trim() ?? "",
     clientSecret: (process.env.GOOGLE_CLIENT_SECRET ?? process.env.GOOGLE_OAUTH_CLIENT_SECRET)?.trim() ?? "",
     redirectUri: process.env.GOOGLE_OAUTH_REDIRECT_URI?.trim() ?? "",
-    connectSecret: process.env.GOOGLE_OAUTH_CONNECT_SECRET?.trim() ?? "",
     expectedEmail: process.env.MIRIAM_GOOGLE_EMAIL?.trim().toLowerCase() ?? "",
   };
 
   if (Object.values(config).some((value) => !value)) {
     throw new Error("Google OAuth environment is not configured");
-  }
-  if (config.connectSecret.length < 32) {
-    throw new Error("Google OAuth connection secret must have at least 32 characters");
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(config.expectedEmail)) {
     throw new Error("Miriam Google email is invalid");
