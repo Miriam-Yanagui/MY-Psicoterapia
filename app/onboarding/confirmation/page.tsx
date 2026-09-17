@@ -12,7 +12,7 @@ import { routes } from "@/lib/flow";
 import { isAuthoritativelyConfirmed } from "@/lib/confirmation";
 
 const MIRIAM_WHATSAPP = "5216243167794";
-const WHATSAPP_MESSAGE = "Hola Miriam, acabo de agendar mi sesión y todavía tengo una duda.";
+const WHATSAPP_MESSAGE = "Hola, Psico. Miriam Yanagui. Acabo de agendar mi sesión y todavía tengo una duda.";
 const WHATSAPP_WEB_URL = `https://wa.me/${MIRIAM_WHATSAPP}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
 
 function openWhatsAppMessenger(event: React.MouseEvent<HTMLAnchorElement>) {
@@ -69,7 +69,7 @@ export default function ConfirmationPage() {
         transition={{ duration: reduced ? 0.15 : 0.38 }}
       >…</motion.div>}
       <h1>{confirmed ? "Tu espacio está reservado." : "Verificando tu cita…"}</h1>
-      <p className="f12-description">{confirmed ? "Recibimos tu pago y confirmamos tu sesión con Miriam." : "Espera un momento mientras comprobamos la confirmación."}</p>
+      <p className="f12-description">{confirmed ? "Recibimos tu pago y confirmamos tu sesión con la Psico. Miriam Yanagui." : "Espera un momento mientras comprobamos la confirmación."}</p>
       {confirmed && booking && <>
         <div className="f12-summary" aria-label="Resumen de tu cita">
           <p className="f12-summary-label">RESUMEN</p>
@@ -81,12 +81,12 @@ export default function ConfirmationPage() {
           <h2>¿Qué sigue?</h2>
           <ol>
             <li>Guarda esta confirmación.</li>
-            <li>Miriam usará <strong>{booking.contact?.email ?? "tu correo registrado"}</strong> para compartir los detalles de acceso.</li>
+            <li>La Psico. Miriam Yanagui usará <strong>{booking.contact?.email ?? "tu correo registrado"}</strong> para compartir los detalles de acceso.</li>
             <li>Conéctate a Google Meet cinco minutos antes.</li>
           </ol>
         </div>
         <div className="f12-whatsapp-help">
-          <p>Si aún tienes dudas, puedes dejarle un mensaje a la psicóloga Miriam. Te responderá en cuanto esté disponible.</p>
+          <p>Si aún tienes dudas, puedes dejarle un mensaje a la Psico. Miriam Yanagui. Te responderá en cuanto esté disponible.</p>
           <a
             className="f12-whatsapp-button"
             href={WHATSAPP_WEB_URL}
@@ -95,7 +95,7 @@ export default function ConfirmationPage() {
             onClick={openWhatsAppMessenger}
           >
             <span aria-hidden="true">💬</span>
-            Hablar con Miriam
+            Hablar con la Psico. Miriam
           </a>
         </div>
       </>}

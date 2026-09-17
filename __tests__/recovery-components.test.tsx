@@ -103,7 +103,7 @@ describe("ConfirmationPage — retry real", () => {
     expect(screen.getByText(/17:00 · Google Meet/i)).toBeTruthy();
     expect(screen.getByText(/Pago confirmado · \$5 MXN/i)).toBeTruthy();
     expect(screen.getByText("¿Qué sigue?")).toBeTruthy();
-    const whatsappLink = screen.getByRole("link", { name: /Hablar con Miriam/i });
+    const whatsappLink = screen.getByRole("link", { name: /Hablar con la Psico\. Miriam/i });
     expect(whatsappLink.getAttribute("href")).toContain("https://wa.me/5216243167794");
     expect(whatsappLink.getAttribute("target")).toBe("_blank");
     expect(mockReplace).not.toHaveBeenCalled();

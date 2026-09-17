@@ -15,7 +15,6 @@ interface Testimonial {
   name: string;
   quote: string;
   rating: number;
-  source: string;
   portrait: string;
 }
 
@@ -25,7 +24,6 @@ const testimonials: Testimonial[] = [
     name: "Mariana Saldivar",
     quote: "Miriam ha sido excelente tanto en lo profesional como en su calidez humana.",
     rating: 5,
-    source: "Doctoralia",
     portrait: "/assets/f06b-testimonial-portrait.png",
   },
 ];
@@ -113,7 +111,7 @@ export default function TestimonialPage() {
             <p className="f06b-portrait-label">{t.name}</p>
             <blockquote>{t.quote}</blockquote>
             <p className="f06b-stars" aria-label={`${t.rating} estrellas`}>{"★".repeat(t.rating)}</p>
-            <p className="f06b-attribution">Opinión publicada en {t.source}</p>
+            <p className="f06b-attribution"><span>Opinión publicada en</span><Image src="/assets/doctoralia.png" alt="Doctoralia" width={92} height={17} /></p>
           </motion.article>
         </AnimatePresence>
       </div>

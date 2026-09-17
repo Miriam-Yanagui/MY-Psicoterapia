@@ -27,9 +27,9 @@ export default function OrientationPage() {
         <p className="f08-eyebrow">LO QUE NOS COMPARTISTE</p><p className="f08-chip">Para {name}</p>
         <div className="f08-saved" aria-hidden="true"><motion.span animate={reduced ? undefined : { y: [0, -5, 0], rotate: [0, -3, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}>📩</motion.span><i>✨</i></div>
         <h1>Gracias por<br />compartirlo.</h1>
-        <p className="f08-response">Tus respuestas pueden servir como punto de partida para conversar con Miriam en una primera sesión.</p>
+        <p className="f08-response">Tus respuestas pueden servir como punto de partida para conversar con la Psico. Miriam Yanagui en una primera sesión.</p>
         <div className="f08-divider" aria-hidden="true" />
-        <section className="f08-work f08-work--context" aria-label="Sobre tus respuestas"><h2>Un espacio seguro para comenzar</h2><p>Miriam podrá escucharte directamente, hacerte las preguntas adecuadas y explorar contigo lo que hoy sea importante.</p><p>Estas respuestas no son un diagnóstico ni una evaluación clínica.</p></section>
+        <section className="f08-work f08-work--context" aria-label="Sobre tus respuestas"><h2>Un espacio seguro para comenzar</h2><p>La Psico. Miriam Yanagui podrá escucharte directamente, hacerte las preguntas adecuadas y explorar contigo lo que hoy sea importante.</p><p>Estas respuestas no son un diagnóstico ni una evaluación clínica.</p></section>
         <FlowNav
           className="f08-button"
           backHref={routes.testimonial}

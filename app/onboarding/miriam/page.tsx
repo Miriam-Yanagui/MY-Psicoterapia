@@ -31,14 +31,14 @@ export default function MiriamPage() {
       transition={{ delay: show ? 0.1 : 0, duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
     >
       <p>HOLA, {name.toLocaleUpperCase("es-MX")}.</p>
-      <h1 id="miriam-title">Soy Miriam Yanagui.</h1>
+      <h1 id="miriam-title">Soy la Psico. Miriam Yanagui.</h1>
       <motion.div
         className="f06-portrait"
         initial={fadeOnly ? { opacity: 0 } : { opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: show ? 0.22 : 0, duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
       >
-        <Image src="/assets/f02-miriam-pointing.png" alt="Miriam Yanagui" width={455} height={682} priority />
+        <Image src="/assets/f02-miriam-pointing.png" alt="Psicóloga Miriam Yanagui" width={455} height={682} priority />
       </motion.div>
       <p className="f06-specialty">Psicóloga y psicoterapeuta con maestría en<br />Psicoterapia Cognitivo-Conductual.</p>
       <p className="f06-body">Con lo que me compartiste, podemos comenzar a trabajar juntas a tu ritmo.</p>

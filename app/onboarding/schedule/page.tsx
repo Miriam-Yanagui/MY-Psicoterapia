@@ -274,7 +274,7 @@ export default function SchedulePage() {
         const displayTime = slotTime(slot);
         return <TimeSlot key={slot.id} time={displayTime} selected={time === displayTime} onSelect={() => selectTime(displayTime)} />;
       })}</div>
-      <p className="f09-timezone">{scheduleCalendarFixture.timezoneLabel}</p>
+      <p className="f09-timezone"><span aria-hidden="true">←</span><em>{scheduleCalendarFixture.timezoneLabel}</em><span aria-hidden="true">→</span></p>
       <FlowNav
         backHref={routes.miriam}
         continueLabel={holdState === "pending" ? "Reservando…" : "Continuar"}

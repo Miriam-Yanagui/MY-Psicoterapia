@@ -40,3 +40,4 @@
 .checkout-privacy,.checkout--details .checkout-privacy,.checkout--payment .checkout-privacy{left:48px;top:807px;width:294px;color:rgba(255,255,255,.78);font-size:8px}
 .checkout-payment-flow{margin-top:862px;padding:24px 16px 28px;border-top:0;border-radius:22px;background:var(--color-warm-white);scroll-margin-top:12px}
 .checkout--payment{padding-bottom:28px;background:var(--color-orange)}
+.checkout-ticket-grid div:nth-child(4) dd{text-align:center}.checkout-card-payment{display:flex;align-items:center;justify-content:center;gap:3px}

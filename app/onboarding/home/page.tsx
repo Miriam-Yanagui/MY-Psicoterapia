@@ -41,7 +41,7 @@ export default function HomePage() {
         <Image
           className="f01-photo"
           src="/assets/f01-miriam-home.png"
-          alt="Miriam Yanagui"
+          alt="Psicóloga Miriam Yanagui"
           width={390}
           height={693}
           priority
