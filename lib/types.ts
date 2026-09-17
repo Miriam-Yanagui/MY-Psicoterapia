@@ -22,6 +22,8 @@ export type BookingHold = {
   appointmentId: string;
   slotId: string;
   holdExpiresAt: string;
+  amountMinor: number;
+  currency: "MXN";
   status?: "held" | "payment_pending" | "confirmed";
 };
 

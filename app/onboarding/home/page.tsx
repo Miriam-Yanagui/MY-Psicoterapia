@@ -136,7 +136,7 @@ export default function HomePage() {
           initial={r ? { opacity: 1 } : "hidden"}
           animate={r ? { opacity: 1 } : "visible"}
         >
-          Pago con tarjeta · <strong>$5 MXN</strong> · 50 minutos
+          Pago con tarjeta · <strong>$800 MXN</strong> · 50 minutos
         </motion.p>
       </motion.div>
       </ScreenLift>

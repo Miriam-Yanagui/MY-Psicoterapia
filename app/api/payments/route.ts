@@ -9,6 +9,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-
 const TOKEN = /^[A-Za-z0-9._-]{10,512}$/;
 const METHOD = /^[a-z0-9_-]{1,40}$/;
 const TYPES = new Set(["credit_card", "debit_card", "prepaid_card"]);
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type BeginRow = { result_status: string; result_code: string | null; payment_id: string | null; provider_idempotency_key: string | null; external_reference: string | null; amount_minor: number | null; currency: "MXN" | null; payer_email: string | null; payment_status: string | null; should_submit: boolean };
 const safeStatus = (status: string | null): SafePaymentStatus =>
@@ -28,16 +29,19 @@ export async function POST(request: NextRequest) {
     paymentMethodId: typeof body.paymentMethodId === "string" ? body.paymentMethodId : "",
     paymentTypeId: TYPES.has(paymentTypeId) ? paymentTypeId as CardPaymentSubmission["paymentTypeId"] : "credit_card",
     installments: typeof body.installments === "number" ? body.installments : 0,
+    payerEmail: typeof body.payerEmail === "string" ? body.payerEmail.trim().toLowerCase() : "",
   };
   if (!UUID.test(requestedKey) || !TOKEN.test(input.token) || !METHOD.test(input.paymentMethodId)
-      || !TYPES.has(paymentTypeId) || !Number.isInteger(input.installments) || input.installments < 1 || input.installments > 24) {
+      || !TYPES.has(paymentTypeId) || !Number.isInteger(input.installments) || input.installments < 1 || input.installments > 24
+      || !EMAIL.test(input.payerEmail) || input.payerEmail.length > 254) {
     return NextResponse.json({ code: "INVALID_PAYMENT" }, { status: 400 });
   }
 
   const recoveryHash = hashBookingRecoverySecret(secret);
   const supabase = createServerSupabaseClient();
-  const { data, error } = await supabase.rpc("begin_payment_attempt", {
+  const { data, error } = await supabase.rpc("begin_payment_attempt_with_email", {
     p_booking_access_token_hash: recoveryHash, p_requested_idempotency_key: requestedKey,
+    p_payer_email: input.payerEmail,
   });
   if (error) return NextResponse.json({ code: "PAYMENT_UNAVAILABLE" }, { status: 503 });
   const attempt = (data as BeginRow[] | null)?.[0];

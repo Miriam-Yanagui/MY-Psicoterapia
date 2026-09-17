@@ -54,11 +54,19 @@ export async function POST(request: Request) {
     if (!result) throw new Error("Missing hold result");
 
     if (result.result_status === "held" && result.appointment_id && result.hold_expires_at) {
+      const { data: appointment, error: appointmentError } = await supabase
+        .from("appointments")
+        .select("amount_minor,currency")
+        .eq("id", result.appointment_id)
+        .single();
+      if (appointmentError || !appointment || appointment.currency !== "MXN") throw appointmentError ?? new Error("Missing hold amount");
       const response = NextResponse.json({
         status: "held",
         appointmentId: result.appointment_id,
         slotId: result.slot_id,
         holdExpiresAt: result.hold_expires_at,
+        amountMinor: appointment.amount_minor,
+        currency: appointment.currency,
       }, { status: result.replayed ? 200 : 201 });
       setBookingSessionCookie(response, recovery.secret);
       return response;

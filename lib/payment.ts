@@ -5,6 +5,7 @@ export type CardPaymentSubmission = {
   paymentMethodId: string;
   paymentTypeId: "credit_card" | "debit_card" | "prepaid_card";
   installments: number;
+  payerEmail: string;
 };
 
 export function paymentStatusForProvider(status: string): Exclude<SafePaymentStatus, "approved"> {

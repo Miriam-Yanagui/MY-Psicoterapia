@@ -37,7 +37,7 @@ describe("reducer — selectDate", () => {
     const state: OnboardingState = {
       ...initialState,
       appointment: { date: "2026-09-16", time: "18:00" },
-      booking: { appointmentId: "a1", slotId: "s1", holdExpiresAt: "2026-09-16T18:10:00Z" },
+      booking: { appointmentId: "a1", slotId: "s1", holdExpiresAt: "2026-09-16T18:10:00Z", amountMinor: 80000, currency: "MXN" },
     };
     const result = reducer(state, { type: "selectDate", date: "2026-09-17" });
     expect(result.booking).toBeNull();

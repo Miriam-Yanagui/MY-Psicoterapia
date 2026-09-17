@@ -16,6 +16,7 @@ import { slotDate, slotTime, type AvailabilityResponse, type AvailabilitySlot } 
 import { createBookingHold } from "@/lib/booking";
 import { scheduleCalendarFixture } from "@/lib/mockAvailability";
 import { routes } from "@/lib/flow";
+import { createUuid } from "@/lib/uuid";
 
 type HoldUiState = "idle" | "pending" | "error";
 
@@ -184,7 +185,7 @@ export default function SchedulePage() {
     const isSamePendingSlot = pendingSlotIdRef.current === requestedSlotId && idempotencyKeyRef.current;
     const idempotencyKey = isSamePendingSlot && idempotencyKeyRef.current
       ? idempotencyKeyRef.current
-      : crypto.randomUUID();
+      : createUuid();
 
     idempotencyKeyRef.current = idempotencyKey;
     pendingSlotIdRef.current = requestedSlotId;
@@ -208,6 +209,8 @@ export default function SchedulePage() {
           appointmentId: result.appointmentId,
           slotId: result.slotId,
           holdExpiresAt: result.holdExpiresAt,
+          amountMinor: result.amountMinor,
+          currency: result.currency,
         },
       });
 

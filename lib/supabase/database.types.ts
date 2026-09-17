@@ -142,6 +142,10 @@ export type Database = {
         Args: { p_booking_access_token_hash: string; p_requested_idempotency_key: string }
         Returns: { amount_minor: number | null; currency: string | null; external_reference: string | null; payer_email: string | null; payment_id: string | null; payment_status: Database["public"]["Enums"]["payment_status"] | null; provider_idempotency_key: string | null; result_code: string | null; result_status: string; should_submit: boolean }[]
       }
+      begin_payment_attempt_with_email: {
+        Args: { p_booking_access_token_hash: string; p_requested_idempotency_key: string; p_payer_email: string }
+        Returns: { amount_minor: number | null; currency: string | null; external_reference: string | null; payer_email: string | null; payment_id: string | null; payment_status: Database["public"]["Enums"]["payment_status"] | null; provider_idempotency_key: string | null; result_code: string | null; result_status: string; should_submit: boolean }[]
+      }
       finish_payment_attempt: {
         Args: { p_booking_access_token_hash: string; p_payment_id: string; p_provider_order_id: string | null; p_provider_payment_id: string | null; p_status: Database["public"]["Enums"]["payment_status"]; p_status_detail: string | null }
         Returns: undefined
@@ -164,6 +168,10 @@ export type Database = {
           result_code: string | null
           result_status: string
         }[]
+      }
+      save_booking_consent: {
+        Args: { p_booking_access_token_hash: string; p_consent_version: string }
+        Returns: { appointment_id: string | null; hold_expires_at: string | null; result_code: string | null; result_status: string }[]
       }
     }
     Enums: {

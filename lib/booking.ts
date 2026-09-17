@@ -6,6 +6,8 @@ export type HoldSuccess = {
   appointmentId: string;
   slotId: string;
   holdExpiresAt: string;
+  amountMinor: number;
+  currency: "MXN";
 };
 
 export type HoldUnavailable = {
@@ -27,6 +29,7 @@ export type CurrentBooking = {
   holdExpiresAt: string | null;
   slot: { id: string; startsAt: string; endsAt: string; timezone: string };
   contact: { email: string; countryCode: string; phone: string; consented: boolean } | null;
+  consented: boolean;
   amountMinor: number;
   currency: "MXN";
   payment: { id: string; status: "processing" | "pending" | "approved_provisional" | "approved" | "rejected" } | null;
@@ -37,6 +40,8 @@ export function toBookingHold(result: HoldSuccess): BookingHold {
     appointmentId: result.appointmentId,
     slotId: result.slotId,
     holdExpiresAt: result.holdExpiresAt,
+    amountMinor: result.amountMinor,
+    currency: result.currency,
   };
 }
 
@@ -127,6 +132,8 @@ export function recoveredBookingState(current: CurrentBooking) {
       slotId: current.slot.id,
       holdExpiresAt: current.holdExpiresAt ?? new Date(0).toISOString(),
       status: current.status,
+      amountMinor: current.amountMinor,
+      currency: current.currency,
     },
     appointment: {
       date: slotDate(current.slot),
@@ -160,6 +167,22 @@ export async function saveBookingContact(contact: {
   const payload = await response.json().catch(() => null) as { code?: string } | null;
   throw Object.assign(new Error(payload?.code ?? "CONTACT_UNAVAILABLE"), {
     code: payload?.code ?? "CONTACT_UNAVAILABLE",
+    status: response.status,
+  });
+}
+
+export async function saveBookingConsent(consented: boolean): Promise<void> {
+  const response = await fetch("/api/bookings/consent", {
+    method: "POST",
+    cache: "no-store",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ consented }),
+  });
+  if (response.ok) return;
+
+  const payload = await response.json().catch(() => null) as { code?: string } | null;
+  throw Object.assign(new Error(payload?.code ?? "CONSENT_UNAVAILABLE"), {
+    code: payload?.code ?? "CONSENT_UNAVAILABLE",
     status: response.status,
   });
 }

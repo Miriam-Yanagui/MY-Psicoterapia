@@ -3,6 +3,7 @@
 import { CardPayment, initMercadoPago } from "@mercadopago/sdk-react";
 import { useCallback, useMemo, useRef, useState, type Ref } from "react";
 import { submitCardPayment, type SafePaymentStatus } from "@/lib/payment";
+import { createUuid } from "@/lib/uuid";
 
 const publicKey = process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY;
 if (publicKey) initMercadoPago(publicKey, { locale: "es-MX" });
@@ -20,18 +21,18 @@ export function PaymentSection({ amountMinor, currency, status: initialStatus, o
 }) {
   const [status, setStatus] = useState<SafePaymentStatus | undefined>(initialStatus);
   const [error, setError] = useState<string | null>(null);
-  const attemptKey = useRef(crypto.randomUUID());
+  const attemptKey = useRef(createUuid());
   const initialization = useMemo(() => ({ amount: amountMinor / 100 }), [amountMinor]);
   const customization = useMemo(() => ({ paymentMethods: { types: { included: ["credit_card", "debit_card", "prepaid_card"] as Array<"credit_card" | "debit_card" | "prepaid_card"> } } }), []);
   const displayedStatus = initialStatus === "approved" ? "approved" : status ?? initialStatus;
-  const handleSubmit = useCallback(async (form: { token: string; payment_method_id: string; installments: number }, additional?: { paymentTypeId?: string }) => {
+  const handleSubmit = useCallback(async (form: { token: string; payment_method_id: string; installments: number; payer?: { email?: string } }, additional?: { paymentTypeId?: string }) => {
     setError(null); setStatus("processing");
     try {
       const result = await submitCardPayment({ token: form.token, paymentMethodId: form.payment_method_id,
         paymentTypeId: additional?.paymentTypeId === "debit_card" || additional?.paymentTypeId === "prepaid_card" ? additional.paymentTypeId : "credit_card",
-        installments: form.installments }, attemptKey.current);
+        installments: form.installments, payerEmail: form.payer?.email?.trim().toLowerCase() ?? "" }, attemptKey.current);
       setStatus(result.status);
-      if (result.status === "rejected") attemptKey.current = crypto.randomUUID();
+      if (result.status === "rejected") attemptKey.current = createUuid();
     } catch (requestError) {
       const code = requestError instanceof Error && "code" in requestError ? String((requestError as { code: string }).code) : "";
       if (code === "HOLD_EXPIRED" || code === "BOOKING_NOT_ACTIVE" || code === "BOOKING_NOT_FOUND") {

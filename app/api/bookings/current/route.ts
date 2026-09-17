@@ -89,14 +89,15 @@ export async function GET(request: NextRequest) {
         endsAt: slot.ends_at,
         timezone: slot.timezone,
       },
-      contact: data.email && data.country_code && data.phone && data.consented_at
+      contact: data.email && data.consented_at
         ? {
             email: data.email,
-            countryCode: data.country_code,
-            phone: data.phone.slice(data.country_code.length),
+            countryCode: data.country_code ?? "",
+            phone: data.phone && data.country_code ? data.phone.slice(data.country_code.length) : "",
             consented: true,
           }
         : null,
+      consented: Boolean(data.consented_at),
       amountMinor: data.amount_minor,
       currency: data.currency,
       payment: latestPayment ? {

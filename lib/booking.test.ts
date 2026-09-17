@@ -11,7 +11,7 @@ function fakeBooking(overrides?: Partial<CurrentBooking>): CurrentBooking {
     appointmentId: "apt-1", status: "held",
     holdExpiresAt: new Date(Date.now() + 600_000).toISOString(),
     slot: { id: "slot-1", startsAt: "2026-09-16T18:00:00-05:00", endsAt: "2026-09-16T18:50:00-05:00", timezone: "America/Mexico_City" },
-    contact: null, amountMinor: 500, currency: "MXN", payment: null,
+    contact: null, consented: false, amountMinor: 500, currency: "MXN", payment: null,
     ...overrides,
   };
 }

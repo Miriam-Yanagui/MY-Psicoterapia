@@ -44,6 +44,7 @@ vi.mock("@/lib/booking", async (importOriginal) => {
     ...actual,
     recoverCurrentBooking: mockRecoverCurrentBooking,
     saveBookingContact: vi.fn(),
+    saveBookingConsent: vi.fn(),
   };
 });
 vi.mock("@/lib/payment", () => ({
@@ -63,7 +64,7 @@ function fakeBooking(overrides?: Record<string, unknown>) {
     appointmentId: "apt-1", status: "held",
     holdExpiresAt: new Date(Date.now() + 600_000).toISOString(),
     slot: { id: "slot-1", startsAt: "2026-09-16T18:00:00-05:00", endsAt: "2026-09-16T18:50:00-05:00", timezone: "America/Mexico_City" },
-    contact: null, amountMinor: 500, currency: "MXN", payment: null,
+    contact: null, consented: false, amountMinor: 500, currency: "MXN", payment: null,
     ...overrides,
   };
 }
@@ -135,6 +136,7 @@ describe("CheckoutPage F11 — null", () => {
   it("clears the recovered booking and navigates to schedule", async () => {
     const heldWithContact = fakeBooking({
       contact: { email: "ana@example.com", countryCode: "+52", phone: "5512345678", consented: true },
+      consented: true,
     });
     mockRecoverCurrentBooking
       .mockResolvedValueOnce(heldWithContact)
