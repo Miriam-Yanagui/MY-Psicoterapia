@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const MONTHS = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
 
 function formatDate(date: string | null) {
@@ -39,12 +41,17 @@ export function AppointmentSummary({ date, time, appointmentId, amountMinor, cur
       <div><dt>FECHA</dt><dd>{formatDate(date)}</dd></div>
       <div><dt>HORA</dt><dd>{formatTime(time)}</dd></div>
       <div><dt>ESPECIALISTA</dt><dd>Psicóloga Miriam Yanagui</dd></div>
-      <div><dt>MODALIDAD</dt><dd><span className="checkout-meet-mark" aria-hidden="true">▰</span> Google Meet</dd></div>
+      <div><dt>MODALIDAD</dt><dd className="checkout-ticket-meet"><Image src="/assets/google-meet-lockup.svg" alt="Google Meet" width={108} height={14} /></dd></div>
       <div><dt>DURACIÓN</dt><dd>50 minutos</dd></div>
       <div><dt>TOTAL</dt><dd className="checkout-ticket-total">${(amountMinor / 100).toLocaleString("es-MX")} {currency}</dd></div>
     </dl>
     <div className="checkout-ticket-rule checkout-ticket-rule--lower" />
-    <p className="checkout-card-payment">▣ &nbsp;Pago seguro con tarjeta</p>
+    <div className="checkout-card-payment">
+      <span>Pago seguro con tarjeta</span>
+      <span className="checkout-card-brands" aria-label="Visa, Mastercard y Maestro">
+        <Image src="/assets/pago-seguro.png" alt="" width={160} height={51} />
+      </span>
+    </div>
     <div className="checkout-barcode" aria-hidden="true">
       {bars.map((width, index) => <i key={index} style={{ width }} />)}
     </div>

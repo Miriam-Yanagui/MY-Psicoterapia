@@ -26,9 +26,9 @@
 .checkout-ticket-rule{position:absolute;left:28px;top:154px;width:278px;border-top:1.5px dashed #d8c9bc}
 .checkout-ticket-grid{position:absolute;left:30px;top:182px;width:274px;margin:0;display:grid;grid-template-columns:1fr 1fr;column-gap:18px;row-gap:19px}
 .checkout-ticket-grid div{min-width:0}.checkout-ticket-grid dt{margin:0 0 5px;color:#a48c7a;font-size:8px;font-weight:800;letter-spacing:1px}.checkout-ticket-grid dd{margin:0;font-size:12px;font-weight:750;line-height:1.25}.checkout-ticket-grid div:nth-child(3) dd{font-size:11px}.checkout-ticket-total{color:var(--color-orange);font-size:16px!important}
-.checkout-meet-mark{display:inline-block;color:#19a463;transform:skew(-8deg)}
+.checkout-ticket-meet{display:flex;align-items:center;justify-content:center}.checkout-ticket-meet img{display:block;width:auto;height:14px}
 .checkout-ticket-rule--lower{top:372px}
-.checkout-card-payment{position:absolute;left:30px;top:393px;width:274px;margin:0;padding:10px 12px;border-radius:10px;background:#fff3ed;color:var(--color-orange);font-size:10px;font-weight:800;text-align:center}
+.checkout-card-payment{position:absolute;left:30px;top:393px;width:274px;height:38px;margin:0;padding:0 12px;border-radius:10px;background:#fff3ed;color:var(--color-orange);font-size:10px;font-weight:800;text-align:center}.checkout-card-brands{position:relative;width:88px;height:22px;overflow:hidden}.checkout-card-brands img{position:absolute;left:-13px;top:-17px;width:160px;height:auto;max-width:none}
 .checkout-barcode{position:absolute;left:54px;top:454px;width:226px;height:62px;display:flex;align-items:stretch;justify-content:center;gap:2px;overflow:hidden}.checkout-barcode i{display:block;flex:none;height:100%;background:var(--color-text)}
 .checkout-booking-reference{position:absolute;left:30px;top:528px;width:274px;margin:0;color:#7c695b;font-size:9px;font-weight:750;letter-spacing:2px;text-align:center}
 .checkout-timer{left:48px;top:654px;width:294px;height:32px;border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.16);color:var(--color-warm-white);font-size:10px}.checkout-timer strong{margin-left:4px;font-size:12px}.checkout-timer--expired{background:#fff0ea;color:#a33124}
