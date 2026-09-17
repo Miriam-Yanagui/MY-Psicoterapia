@@ -5,7 +5,7 @@ export const metadata: Metadata = { title: "Aviso de privacidad · Psico. Miriam
 
 export default function PrivacyNoticePage() {
   return <LegalPage eyebrow="TU INFORMACIÓN" title="Aviso de privacidad" updated="17 de septiembre de 2026">
-    <p><strong>Psico. Miriam Yanagui</strong>, con domicilio profesional en C. Perla 2368, Victoria, C.P. 45089, Zapopan, Jalisco, México, es responsable del tratamiento y protección de los datos personales recabados mediante este sitio.</p>
+    <p><strong>Psico. Miriam Yanagui</strong>, responsable de la aplicación <strong>MY Psicoterapia</strong>, con domicilio profesional en C. Perla 2368, Victoria, C.P. 45089, Zapopan, Jalisco, México, es responsable del tratamiento y protección de los datos personales recabados mediante este sitio.</p>
 
     <h2>Datos que utilizamos</h2>
     <p>Para gestionar una cita podemos tratar tu nombre, correo electrónico, datos de la reservación, fecha y hora elegidas, referencia y estado del pago. Mercado Pago procesa directamente los datos de tu tarjeta; este sitio no recibe ni almacena el número completo de tarjeta ni el código de seguridad.</p>
@@ -22,6 +22,11 @@ export default function PrivacyNoticePage() {
 
     <h2>Proveedores y transferencias</h2>
     <p>Para prestar el servicio intervienen proveedores tecnológicos que procesan información bajo sus propios controles de seguridad: Vercel para alojamiento, Supabase para la infraestructura de datos, Mercado Pago para el cobro y Google Meet para la videollamada. Si decides abrir WhatsApp, la comunicación estará sujeta a las condiciones de ese servicio.</p>
+
+    <h2>Uso de Google Calendar y Google Meet</h2>
+    <p>Con autorización expresa de la Psico. Miriam Yanagui, MY Psicoterapia puede conectarse a su cuenta profesional de Google Calendar exclusivamente para crear, consultar, actualizar o cancelar el evento correspondiente a una cita y generar su enlace de Google Meet. La aplicación limita el uso a los datos necesarios para esa operación: fecha y horario de la sesión, duración, correo de la persona invitada, título operativo del evento e identificadores del evento y la videollamada.</p>
+    <p>La información obtenida mediante las APIs de Google se utiliza únicamente para administrar la cita y compartir los datos de acceso. No se utiliza para publicidad, elaboración de perfiles, diagnósticos ni entrenamiento de modelos; tampoco se vende. MY Psicoterapia no solicita acceso al Gmail, Google Drive, contactos o calendario personal del paciente.</p>
+    <p>Los identificadores del evento y de la videollamada se conservan sólo durante el tiempo necesario para operar, comprobar o aclarar la reservación. La autorización de la cuenta profesional puede revocarse desde la configuración de seguridad de Google; al revocarla, la aplicación deja de acceder a datos nuevos, sin afectar las obligaciones de conservación aplicables a citas ya realizadas.</p>
 
     <h2>Conservación y seguridad</h2>
     <p>Conservamos la información sólo durante el tiempo necesario para administrar la cita, atender obligaciones profesionales, fiscales o legales y resolver aclaraciones. Aplicamos medidas razonables para evitar accesos, pérdidas o usos no autorizados.</p>

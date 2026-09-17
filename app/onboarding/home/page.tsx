@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { MobileScreen } from "@/components/ui/MobileScreen";
@@ -137,6 +138,7 @@ export default function HomePage() {
           animate={r ? { opacity: 1 } : "visible"}
         >
           Pago con tarjeta · <strong>$800 MXN</strong> · 50 minutos
+          <span className="f01-legal-links"><Link href="/aviso-de-privacidad">Privacidad</Link><i aria-hidden="true">·</i><Link href="/terminos">Términos</Link></span>
         </motion.p>
       </motion.div>
       </ScreenLift>
