@@ -18,7 +18,7 @@ export default function PrivacyNoticePage() {
       <li>Atender dudas relacionadas con la cita y comprobar operaciones.</li>
       <li>Proteger la seguridad, prevenir duplicidades y cumplir obligaciones legales.</li>
     </ul>
-    <p>No utilizamos tus datos para publicidad ni vendemos información personal.</p>
+    <p>No vendemos información personal. Las herramientas opcionales de analítica o medición publicitaria sólo podrán activarse después de que otorgues tu consentimiento desde el panel de cookies.</p>
 
     <h2>Proveedores y transferencias</h2>
     <p>Para prestar el servicio intervienen proveedores tecnológicos que procesan información bajo sus propios controles de seguridad: Vercel para alojamiento, Supabase para la infraestructura de datos, Mercado Pago para el cobro y Google Meet para la videollamada. Si decides abrir WhatsApp, la comunicación estará sujeta a las condiciones de ese servicio.</p>
@@ -30,7 +30,7 @@ export default function PrivacyNoticePage() {
     <p>Puedes solicitar acceso, rectificación, cancelación u oposición al tratamiento de tus datos, así como revocar tu consentimiento o limitar su uso, mediante un mensaje dirigido a la Psico. Miriam Yanagui por WhatsApp al <a href="https://wa.me/526243167794">+52 624 316 7794</a>. Para proteger tu información podremos pedirte datos que permitan acreditar tu identidad y localizar tu cita.</p>
 
     <h2 id="cookies">Cookies y almacenamiento local</h2>
-    <p>Este sitio utiliza una cookie técnica indispensable y temporal para reconocer de forma segura tu reservación entre pantallas. También puede guardar en tu dispositivo la confirmación de que viste el aviso de cookies. No usamos cookies publicitarias ni de seguimiento. Puedes eliminar estos datos desde la configuración de tu navegador; hacerlo durante una reserva puede interrumpir el proceso.</p>
+    <p>Este sitio utiliza una cookie técnica indispensable y temporal para reconocer de forma segura tu reservación entre pantallas. También guarda en tu dispositivo las preferencias elegidas en el panel de cookies. Las categorías opcionales de analítica y marketing permanecen desactivadas mientras no otorgues tu consentimiento y no reciben respuestas del cuestionario ni información clínica. Puedes eliminar estos datos desde la configuración de tu navegador; hacerlo durante una reserva puede interrumpir el proceso.</p>
 
     <h2>Cambios al aviso</h2>
     <p>Las modificaciones se publicarán en esta misma página indicando la fecha de actualización.</p>
