@@ -1,7 +1,20 @@
 import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal/LegalPage";
 
-export const metadata: Metadata = { title: "Términos del servicio · Psico. Miriam Yanagui" };
+export const metadata: Metadata = {
+  title: "Términos del servicio | MY Psicoterapia",
+  description: "Consulta las condiciones de las sesiones de psicoterapia en línea, incluidos honorarios, pagos, cancelaciones y confidencialidad.",
+  alternates: { canonical: "/terminos" },
+  robots: { index: true, follow: true },
+  openGraph: {
+    type: "article",
+    locale: "es_MX",
+    url: "/terminos",
+    siteName: "MY Psicoterapia",
+    title: "Términos del servicio | MY Psicoterapia",
+    description: "Condiciones aplicables a las sesiones de psicoterapia en línea de MY Psicoterapia.",
+  },
+};
 
 export default function TermsPage() {
   return <LegalPage eyebrow="ANTES DE TU SESIÓN" title="Términos del servicio" updated="17 de septiembre de 2026">

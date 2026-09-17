@@ -1,17 +1,12 @@
 import type { MetadataRoute } from "next";
-
-const SITE_URL = "https://www.mypsicoterapia.com";
+import { SITE_URL } from "@/lib/seo";
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: [
-        "/api/",
-        "/onboarding/checkout",
-        "/onboarding/confirmation",
-      ],
+      disallow: "/api/",
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: SITE_URL,

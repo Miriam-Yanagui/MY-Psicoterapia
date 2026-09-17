@@ -1,7 +1,20 @@
 import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal/LegalPage";
 
-export const metadata: Metadata = { title: "Aviso de privacidad · Psico. Miriam Yanagui" };
+export const metadata: Metadata = {
+  title: "Aviso de privacidad | MY Psicoterapia",
+  description: "Conoce cómo MY Psicoterapia utiliza, protege y conserva tus datos personales y la información necesaria para administrar tus citas.",
+  alternates: { canonical: "/aviso-de-privacidad" },
+  robots: { index: true, follow: true },
+  openGraph: {
+    type: "article",
+    locale: "es_MX",
+    url: "/aviso-de-privacidad",
+    siteName: "MY Psicoterapia",
+    title: "Aviso de privacidad | MY Psicoterapia",
+    description: "Información sobre el tratamiento y la protección de datos personales en MY Psicoterapia.",
+  },
+};
 
 export default function PrivacyNoticePage() {
   return <LegalPage eyebrow="TU INFORMACIÓN" title="Aviso de privacidad" updated="17 de septiembre de 2026">
