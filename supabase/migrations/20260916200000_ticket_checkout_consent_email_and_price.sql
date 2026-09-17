@@ -214,14 +214,14 @@ begin
   if not found then return query select 'unavailable', 'SLOT_NOT_FOUND', null::uuid, p_slot_id, null::timestamptz, false; return; end if;
   if v_slot_status <> 'open' then return query select 'unavailable', 'SLOT_NOT_OPEN', null::uuid, p_slot_id, null::timestamptz, false; return; end if;
 
-  update public.appointments set status = 'expired', hold_expires_at = null,
+  update public.appointments as a set status = 'expired', hold_expires_at = null,
     booking_access_token_hash = null, updated_at = v_now
-   where slot_id = p_slot_id and status in ('held', 'payment_pending') and hold_expires_at <= v_now;
+   where a.slot_id = p_slot_id and a.status in ('held', 'payment_pending') and a.hold_expires_at <= v_now;
 
   select a.* into v_existing from public.appointments a where a.hold_idempotency_key = p_idempotency_key;
   if found then
     if v_existing.slot_id = p_slot_id and v_existing.status in ('held', 'payment_pending') and v_existing.hold_expires_at > v_now then
-      update public.appointments set booking_access_token_hash = p_booking_access_token_hash, updated_at = v_now where id = v_existing.id;
+      update public.appointments as a set booking_access_token_hash = p_booking_access_token_hash, updated_at = v_now where a.id = v_existing.id;
       return query select 'held', null::text, v_existing.id, v_existing.slot_id, v_existing.hold_expires_at, true;
     elsif v_existing.slot_id = p_slot_id and v_existing.status = 'expired' then
       return query select 'unavailable', 'HOLD_EXPIRED', null::uuid, p_slot_id, null::timestamptz, true;
