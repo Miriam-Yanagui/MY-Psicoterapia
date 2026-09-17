@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { reconcileMercadoPagoOrder } from "@/lib/mercado-pago/reconcile";
 import { validateMercadoPagoWebhookSignature } from "@/lib/mercado-pago/webhook";
+import { processEmailOutbox } from "@/lib/email/outbox";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -40,6 +41,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const result = await reconcileMercadoPagoOrder(orderId);
+    await processEmailOutbox(4).catch(() => undefined);
     return NextResponse.json({ received: true, result: result.result_status });
   } catch {
     return NextResponse.json({ code: "WEBHOOK_RETRY" }, { status: 503, headers: { "Retry-After": "60" } });

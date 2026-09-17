@@ -8,7 +8,7 @@ import {
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
-const CONSENT_VERSION = "booking-v1";
+const CONSENT_VERSION = "booking-privacy-2026-09-17";
 
 type ConsentRpcRow = {
   result_status: string;

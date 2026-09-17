@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      email_outbox: {
+        Row: {
+          appointment_id: string
+          attempts: number
+          created_at: string
+          id: string
+          kind: string
+          last_error: string | null
+          next_attempt_at: string
+          provider_message_id: string | null
+          recipient: string | null
+          sent_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          appointment_id: string
+          attempts?: number
+          created_at?: string
+          id?: string
+          kind: string
+          last_error?: string | null
+          next_attempt_at?: string
+          provider_message_id?: string | null
+          recipient?: string | null
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          appointment_id?: string
+          attempts?: number
+          created_at?: string
+          id?: string
+          kind?: string
+          last_error?: string | null
+          next_attempt_at?: string
+          provider_message_id?: string | null
+          recipient?: string | null
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [{ foreignKeyName: "email_outbox_appointment_id_fkey"; columns: ["appointment_id"]; isOneToOne: false; referencedRelation: "appointments"; referencedColumns: ["id"] }]
+      }
       appointments: {
         Row: {
           amount_minor: number

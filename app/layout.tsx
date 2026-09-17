@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { OnboardingProvider } from "@/context/OnboardingProvider";
 import { UiClickSound } from "@/components/ui/UiClickSound";
+import { CookieNotice } from "@/components/legal/CookieNotice";
 import "./globals.css";
 import "./checkout.css";
 
@@ -11,5 +12,5 @@ const bethany = localFont({ src: "../public/assets/bethany-elingston.otf", varia
 export const metadata: Metadata = { title: "Miriam Yanagui · Psicóloga", description: "Terapia por videollamada" };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="es"><body className={`${manrope.variable} ${bethany.variable}`}><UiClickSound /><OnboardingProvider>{children}</OnboardingProvider></body></html>;
+  return <html lang="es"><body className={`${manrope.variable} ${bethany.variable}`}><UiClickSound /><OnboardingProvider>{children}</OnboardingProvider><CookieNotice /></body></html>;
 }

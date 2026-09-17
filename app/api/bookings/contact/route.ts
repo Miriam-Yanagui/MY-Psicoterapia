@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const COUNTRY_CODE_PATTERN = /^\+[1-9][0-9]{0,3}$/;
 const NATIONAL_PHONE_PATTERN = /^[0-9]{7,14}$/;
-const CONSENT_VERSION = "booking-v1";
+const CONSENT_VERSION = "booking-privacy-2026-09-17";
 
 type ContactRpcRow = {
   result_status: string;
