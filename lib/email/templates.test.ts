@@ -16,7 +16,10 @@ describe("transactional email templates", () => {
     expect(email.subject).toBe("Tu espacio está reservado.");
     expect(email.html).toContain("$800");
     expect(email.html).toContain("Reserva 12345678AB");
+    expect(email.html).toContain("Firmar acuerdo de psicoterapia");
+    expect(email.html).toContain("jotform.com/es/sign/262517214446051");
     expect(email.text).toContain("Google Meet · 50 minutos");
+    expect(email.text).toContain("jotform.com/es/sign/262517214446051");
   });
 
   it("escapes patient data in the practitioner email", () => {
