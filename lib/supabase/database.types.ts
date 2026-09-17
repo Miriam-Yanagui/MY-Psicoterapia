@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      google_oauth_credentials: {
+        Row: {
+          authorized_email: string
+          connected_at: string
+          id: string
+          refresh_token: string
+          scope: string
+          token_type: string
+          updated_at: string
+        }
+        Insert: {
+          authorized_email: string
+          connected_at?: string
+          id: string
+          refresh_token: string
+          scope?: string
+          token_type?: string
+          updated_at?: string
+        }
+        Update: {
+          authorized_email?: string
+          connected_at?: string
+          id?: string
+          refresh_token?: string
+          scope?: string
+          token_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_outbox: {
         Row: {
           appointment_id: string
