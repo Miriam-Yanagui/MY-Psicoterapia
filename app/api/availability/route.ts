@@ -1,16 +1,18 @@
 import { NextResponse, type NextRequest } from "next/server";
 import type { AvailabilityResponse, AvailabilitySlot } from "@/lib/availability";
+import { buildRollingAvailability, getRollingAvailabilityWindow } from "@/lib/availabilitySchedule";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-const DEFAULT_FROM = "2026-09-01T00:00:00-06:00";
-const DEFAULT_TO = "2026-10-01T00:00:00-06:00";
 const MAX_RANGE_MS = 62 * 24 * 60 * 60 * 1000;
 
 function parseRange(request: NextRequest) {
-  const fromValue = request.nextUrl.searchParams.get("from") ?? DEFAULT_FROM;
-  const toValue = request.nextUrl.searchParams.get("to") ?? DEFAULT_TO;
+  const fromValue = request.nextUrl.searchParams.get("from");
+  const toValue = request.nextUrl.searchParams.get("to");
+
+  if (!fromValue || !toValue) return null;
+
   const from = new Date(fromValue);
   const to = new Date(toValue);
 
@@ -33,12 +35,50 @@ export async function GET(request: NextRequest) {
 
   try {
     const supabase = createServerSupabaseClient();
+    const now = new Date();
+    const window = getRollingAvailabilityWindow(now);
+    const effectiveFrom = new Date(Math.max(new Date(range.from).getTime(), new Date(window.from).getTime())).toISOString();
+    const effectiveTo = new Date(Math.min(new Date(range.to).getTime(), new Date(window.to).getTime())).toISOString();
+
+    if (effectiveTo <= effectiveFrom) {
+      return NextResponse.json({ slots: [] } satisfies AvailabilityResponse, {
+        headers: { "Cache-Control": "no-store" },
+      });
+    }
+
+    const generatedSlots = buildRollingAvailability({ now, from: effectiveFrom, to: effectiveTo });
+    const { data: existingSlots, error: existingSlotsError } = await supabase
+      .from("slots")
+      .select("starts_at, ends_at")
+      .gte("starts_at", effectiveFrom)
+      .lt("starts_at", effectiveTo);
+
+    if (existingSlotsError) throw existingSlotsError;
+
+    const existingSlotKeys = new Set(
+      existingSlots.map((slot) => `${new Date(slot.starts_at).toISOString()}|${new Date(slot.ends_at).toISOString()}`),
+    );
+    const missingSlots = generatedSlots.filter(
+      (slot) => !existingSlotKeys.has(`${new Date(slot.starts_at).toISOString()}|${new Date(slot.ends_at).toISOString()}`),
+    );
+    const generationBatchSize = 50;
+    for (let index = 0; index < missingSlots.length; index += generationBatchSize) {
+      const batch = missingSlots.slice(index, index + generationBatchSize);
+      const { error: generationError } = await supabase
+        .from("slots")
+        .upsert(batch, {
+          onConflict: "starts_at,ends_at",
+          ignoreDuplicates: true,
+        });
+      if (generationError) throw generationError;
+    }
+
     const { data: slots, error: slotsError } = await supabase
       .from("slots")
       .select("id, starts_at, ends_at, timezone")
       .eq("availability_status", "open")
-      .gte("starts_at", range.from)
-      .lt("starts_at", range.to)
+      .gte("starts_at", effectiveFrom)
+      .lt("starts_at", effectiveTo)
       .order("starts_at", { ascending: true });
 
     if (slotsError) throw slotsError;
@@ -77,7 +117,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(response, {
       headers: { "Cache-Control": "no-store" },
     });
-  } catch {
+  } catch (error) {
+    console.error("Availability request failed", error);
     return NextResponse.json({ error: "AVAILABILITY_UNAVAILABLE" }, { status: 503 });
   }
 }

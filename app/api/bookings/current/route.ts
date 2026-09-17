@@ -5,6 +5,7 @@ import {
   hashBookingRecoverySecret,
 } from "@/lib/booking-session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { reconcileMercadoPagoOrder } from "@/lib/mercado-pago/reconcile";
 
 export const dynamic = "force-dynamic";
 
@@ -21,14 +22,15 @@ export async function GET(request: NextRequest) {
   try {
     const hash = hashBookingRecoverySecret(secret);
     const supabase = createServerSupabaseClient();
-    const { data, error } = await supabase
+    const { data: initialData, error } = await supabase
       .from("appointments")
       .select("id,status,hold_expires_at,email,country_code,phone,consented_at,amount_minor,currency,slot:slots!inner(id,starts_at,ends_at,timezone)")
       .eq("booking_access_token_hash", hash)
       .maybeSingle();
 
     if (error) throw error;
-    if (!data) return responseUnauthorized();
+    if (!initialData) return responseUnauthorized();
+    let data = initialData;
 
     if (data.status === "held" && (!data.hold_expires_at || new Date(data.hold_expires_at).getTime() <= Date.now())) {
       await supabase
@@ -48,10 +50,34 @@ export async function GET(request: NextRequest) {
 
     const slot = Array.isArray(data.slot) ? data.slot[0] : data.slot;
     if (!slot) throw new Error("Missing booking slot");
-    const { data: latestPayment, error: paymentError } = await supabase.from("payments")
-      .select("id,status").eq("appointment_id", data.id)
+    const { data: initialPayment, error: paymentError } = await supabase.from("payments")
+      .select("id,status,provider_order_id").eq("appointment_id", data.id)
       .order("created_at", { ascending: false }).limit(1).maybeSingle();
     if (paymentError) throw paymentError;
+    let latestPayment = initialPayment;
+
+    if (latestPayment?.status === "approved_provisional" && latestPayment.provider_order_id) {
+      try {
+        await reconcileMercadoPagoOrder(latestPayment.provider_order_id);
+        const [{ data: refreshedBooking, error: refreshedBookingError }, { data: refreshedPayment, error: refreshedPaymentError }] = await Promise.all([
+          supabase
+            .from("appointments")
+            .select("id,status,hold_expires_at,email,country_code,phone,consented_at,amount_minor,currency,slot:slots!inner(id,starts_at,ends_at,timezone)")
+            .eq("id", data.id)
+            .eq("booking_access_token_hash", hash)
+            .maybeSingle(),
+          supabase.from("payments")
+            .select("id,status,provider_order_id")
+            .eq("appointment_id", data.id)
+            .order("created_at", { ascending: false }).limit(1).maybeSingle(),
+        ]);
+        if (refreshedBookingError || refreshedPaymentError) throw refreshedBookingError ?? refreshedPaymentError;
+        if (refreshedBooking) data = refreshedBooking;
+        latestPayment = refreshedPayment;
+      } catch {
+        // Webhook remains the authority of record; recovery can safely retry later.
+      }
+    }
 
     return NextResponse.json({
       appointmentId: data.id,

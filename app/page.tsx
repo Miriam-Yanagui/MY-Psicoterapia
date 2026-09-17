@@ -9,5 +9,8 @@ import { routes } from "@/lib/flow";
 export default function SplashPage() {
   const router = useRouter();
   useEffect(() => { const timer = window.setTimeout(() => router.replace(routes.home), 1000); return () => window.clearTimeout(timer); }, [router]);
-  return <MobileScreen className="splash" fullViewport><Image src="/assets/logo-blanco.png" alt="Miriam Yanagui, Psicóloga" width={278} height={198} priority /></MobileScreen>;
+  return <>
+    <meta httpEquiv="refresh" content={`2;url=${routes.home}`} />
+    <MobileScreen className="splash" fullViewport><Image src="/assets/logo-blanco.png" alt="Miriam Yanagui, Psicóloga" width={278} height={198} priority /></MobileScreen>
+  </>;
 }

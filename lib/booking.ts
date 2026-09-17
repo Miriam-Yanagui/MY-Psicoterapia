@@ -89,10 +89,34 @@ export async function createBookingHold(params: {
   });
 }
 
+export type BookingRecoveryErrorKind = "not_found" | "temporary_failure";
+
+export class BookingRecoveryError extends Error {
+  readonly kind: BookingRecoveryErrorKind;
+  constructor(kind: BookingRecoveryErrorKind, message?: string) {
+    super(message ?? kind);
+    this.name = "BookingRecoveryError";
+    this.kind = kind;
+  }
+}
+
+export function isBookingNotFound(error: unknown): boolean {
+  return error instanceof BookingRecoveryError && error.kind === "not_found";
+}
+
+export function isTemporaryBookingFailure(error: unknown): boolean {
+  return error instanceof BookingRecoveryError && error.kind === "temporary_failure";
+}
+
 export async function recoverCurrentBooking(): Promise<CurrentBooking | null> {
-  const response = await fetch("/api/bookings/current", { cache: "no-store" });
+  let response: Response;
+  try {
+    response = await fetch("/api/bookings/current", { cache: "no-store" });
+  } catch {
+    throw new BookingRecoveryError("temporary_failure", "BOOKING_RECOVERY_NETWORK_ERROR");
+  }
   if (response.status === 401 || response.status === 404) return null;
-  if (!response.ok) throw new Error("BOOKING_RECOVERY_UNAVAILABLE");
+  if (!response.ok) throw new BookingRecoveryError("temporary_failure", `BOOKING_RECOVERY_UNAVAILABLE (${response.status})`);
   return await response.json() as CurrentBooking;
 }
 
