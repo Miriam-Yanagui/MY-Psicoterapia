@@ -41,7 +41,7 @@ export default function HomePage() {
       >
         <Image
           className="f01-photo"
-          src="/assets/f01-miriam-home.png"
+          src="/assets/home-portada.jpg"
           alt="Psicóloga Miriam Yanagui"
           width={390}
           height={693}
@@ -58,11 +58,12 @@ export default function HomePage() {
           <svg className="f01-curve" viewBox="0 0 390 844" aria-hidden="true">
             <path
               fill="#FAF4E9"
-              d="M0,438.9219055175781C85,438.9219055175781,120,407,195,407C270,407,305,438.9219055175781,390,438.9219055175781L390,844L0,844Z"
+              d="M0,468.9219055175781C85,468.9219055175781,120,437,195,437C270,437,305,468.9219055175781,390,468.9219055175781L390,844L0,844Z"
             />
           </svg>
         </motion.div>
 
+        <div className="f01-content">
         <motion.div
           variants={r ? undefined : item(0.24, 10)}
           initial={r ? { opacity: 1 } : "hidden"}
@@ -140,6 +141,7 @@ export default function HomePage() {
           Pago con tarjeta · <strong>$800 MXN</strong> · 50 minutos
           <span className="f01-legal-links"><Link href="/aviso-de-privacidad">Privacidad</Link><i aria-hidden="true">·</i><Link href="/terminos">Términos</Link></span>
         </motion.p>
+        </div>
       </motion.div>
       </ScreenLift>
     </MobileScreen>

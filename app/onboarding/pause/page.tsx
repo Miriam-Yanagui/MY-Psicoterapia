@@ -10,6 +10,7 @@ import { ScreenLift } from "@/components/ui/ScreenLift";
 import { useReducedMotion } from "@/lib/motion";
 import { useOnboarding } from "@/context/OnboardingProvider";
 import { routes } from "@/lib/flow";
+import { playRevealSound } from "@/lib/revealSound";
 import type { Emotion } from "@/lib/types";
 
 const emotionCopies: Record<Emotion, string> = {
@@ -39,6 +40,18 @@ export default function PausePage() {
     setMounted(true);
     if (!wasVisited) sessionStorage.setItem(SESSION_KEY, "1");
   }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
+    const timer = window.setTimeout(() => {
+      playRevealSound();
+    }, reduced ? 0 : 650);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [mounted, reduced]);
 
   const isFirstVisit = mounted && !visited && !reduced;
   const isRevisit = mounted && (visited || reduced);

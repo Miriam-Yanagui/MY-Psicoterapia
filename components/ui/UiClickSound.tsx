@@ -22,7 +22,7 @@ export function UiClickSound() {
     const players = Array.from({ length: 3 }, () => {
       const audio = new Audio("/assets/ui-click.mp3");
       audio.preload = "auto";
-      audio.volume = 0.38;
+      audio.volume = 0.19;
       return audio;
     });
     let playerIndex = 0;

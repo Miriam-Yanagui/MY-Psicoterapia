@@ -12,6 +12,7 @@ import { ScreenLift } from "@/components/ui/ScreenLift";
 import { useOnboarding } from "@/context/OnboardingProvider";
 import type { Emotion } from "@/lib/types";
 import { routes } from "@/lib/flow";
+import { primeRevealSound } from "@/lib/revealSound";
 
 const emotions: Emotion[] = ["Bien","Preocupado/a","Cansado/a","Con estrés","Triste","Frustrado/a","Pensativo/a","No estoy seguro/a"];
 
@@ -29,7 +30,10 @@ export default function EmotionPage() {
         <FlowNav
           backHref={routes.name}
           disabled={!state.emotion}
-          onContinue={() => router.push(routes.pause)}
+          onContinue={() => {
+            primeRevealSound();
+            router.push(routes.pause);
+          }}
         />
       </section>
       </ScreenLift>

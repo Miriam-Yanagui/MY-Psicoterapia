@@ -38,7 +38,7 @@ export default function MiriamPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: show ? 0.22 : 0, duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
       >
-        <Image src="/assets/f02-miriam-pointing.png" alt="Psicóloga Miriam Yanagui" width={455} height={682} priority />
+        <Image src="/assets/miriam-portrait-square.png" alt="Psicóloga Miriam Yanagui" width={516} height={519} priority />
       </motion.div>
       <p className="f06-specialty">Psicóloga y psicoterapeuta con maestría en<br />Psicoterapia Cognitivo-Conductual.</p>
       <p className="f06-body">Con lo que me compartiste, podemos comenzar a trabajar juntas a tu ritmo.</p>

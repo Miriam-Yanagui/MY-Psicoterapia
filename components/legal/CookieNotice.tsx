@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { routes } from "@/lib/flow";
 
 const STORAGE_KEY = "miriam_cookie_consent_v2";
 
@@ -24,15 +26,22 @@ function saveConsent(analytics: boolean, marketing: boolean) {
 }
 
 export function CookieNotice() {
+  const pathname = usePathname();
   const [visible, setVisible] = useState(false);
   const [configuring, setConfiguring] = useState(false);
   const [analytics, setAnalytics] = useState(false);
   const [marketing, setMarketing] = useState(false);
 
   useEffect(() => {
-    try { setVisible(!localStorage.getItem(STORAGE_KEY)); }
-    catch { setVisible(true); }
-  }, []);
+    if (pathname !== routes.home) return;
+
+    const timer = window.setTimeout(() => {
+      try { setVisible(!localStorage.getItem(STORAGE_KEY)); }
+      catch { setVisible(true); }
+    }, 3000);
+
+    return () => window.clearTimeout(timer);
+  }, [pathname]);
 
   useEffect(() => {
     if (!visible) return;

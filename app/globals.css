@@ -31,6 +31,9 @@
 .f06-portrait img{left:9px;top:10px;width:260px}.f06-card{height:630px}.f06-button{top:564px;bottom:auto}
 .goal-option span{left:9px;top:7px;width:115px;height:48px;gap:7px;font-size:11px;line-height:1.2}.goal-option-emoji{flex:0 0 auto;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;font-size:20px;font-weight:400;line-height:1}.goal-option i{display:none}.goal-option[aria-pressed='true']{background:#fff8f0;box-shadow:inset 0 0 0 1px var(--color-orange)}
 .f03-card .flow-nav,.f05-card .flow-nav{top:520px}
+.f06b-portrait{overflow:hidden;object-fit:initial}.f06b-portrait img{position:absolute;left:-33px;top:-34px;width:118px;height:210px;max-width:none}
+.f06-card h1{font-size:20px;white-space:nowrap}.f06-portrait img{left:-1px;top:-1px;width:calc(100% + 2px);height:calc(100% + 2px);object-fit:cover;object-position:50% 10%}.f06b-portrait img{left:0;top:0;width:59px;height:59px;object-fit:cover;max-width:100%}
+.f01-content{position:absolute;inset:0;transform:translateY(28px) scale(.92);transform-origin:50% 407px}.f06b-portrait{left:128px;top:40px;width:68px;height:68px}.f06b-portrait img{width:68px;height:68px}
 
 .checkout-consent-label a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 .f01-legal-links{margin-top:3px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:9px;line-height:13px}.f01-legal-links a{color:var(--color-support);font-weight:650;text-decoration:underline;text-underline-offset:2px}.f01-legal-links i{font-style:normal;opacity:.6}

@@ -20,11 +20,11 @@ interface Testimonial {
 
 const testimonials: Testimonial[] = [
   {
-    id: "mariana-saldivar",
-    name: "Mariana Saldivar",
+    id: "itzhel-mora",
+    name: "Itzhel Mora",
     quote: "Miriam ha sido excelente tanto en lo profesional como en su calidez humana.",
     rating: 5,
-    portrait: "/assets/f06b-testimonial-portrait.png",
+    portrait: "/assets/testimonial-itzhel-mora.png",
   },
 ];
 
@@ -106,8 +106,9 @@ export default function TestimonialPage() {
             }}
           >
             <p className="f06b-quote" aria-hidden="true">{"\u201C"}</p>
-            <div className="f06b-ring" aria-hidden="true" />
-            <Image className="f06b-portrait" src={t.portrait} alt={t.name} width={59} height={59} priority />
+            <span className="f06b-portrait" aria-hidden="true">
+              <Image src={t.portrait} alt="" width={68} height={68} priority />
+            </span>
             <p className="f06b-portrait-label">{t.name}</p>
             <blockquote>{t.quote}</blockquote>
             <p className="f06b-stars" aria-label={`${t.rating} estrellas`}>{"★".repeat(t.rating)}</p>
