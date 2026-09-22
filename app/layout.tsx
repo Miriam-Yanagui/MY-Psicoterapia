@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { OnboardingProvider } from "@/context/OnboardingProvider";
 import { UiClickSound } from "@/components/ui/UiClickSound";
@@ -20,6 +20,12 @@ export const metadata: Metadata = {
     icon: [{ url: "/assets/isotipo_miriam.svg", type: "image/svg+xml" }],
     shortcut: "/assets/isotipo_miriam.svg",
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

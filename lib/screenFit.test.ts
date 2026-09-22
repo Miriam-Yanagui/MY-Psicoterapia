@@ -24,6 +24,14 @@ describe("calculateScreenLift", () => {
     expect(calculateScreenLift({ ...base, viewportWidth: 375, viewportHeight: 667 })).toBe(0);
   });
 
+  it("can keep fitting on short viewports when a screen opts in", () => {
+    expect(calculateScreenLift({ ...base, minFitHeight: 0, maxLift: 180, viewportWidth: 375, viewportHeight: 617 })).toBe(180);
+  });
+
+  it("includes the device safe area in the requested clearance", () => {
+    expect(calculateScreenLift({ ...base, minFitHeight: 0, safeBottom: 50, viewportWidth: 390, viewportHeight: 780 })).toBe(75);
+  });
+
   it("does not apply mobile fitting on desktop", () => {
     expect(calculateScreenLift({ ...base, viewportWidth: 1280, viewportHeight: 720 })).toBe(0);
   });
