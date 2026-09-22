@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { OnboardingProvider } from "@/context/OnboardingProvider";
 import { UiClickSound } from "@/components/ui/UiClickSound";
 import { CookieNotice } from "@/components/legal/CookieNotice";
+import { MetaHomePageView } from "@/components/analytics/MetaHomePageView";
 import { LANDING_DESCRIPTION, LANDING_TITLE, SITE_URL } from "@/lib/seo";
 import "./globals.css";
 import "./checkout.css";
@@ -22,5 +23,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="es"><body className={`${manrope.variable} ${bethany.variable}`}><UiClickSound /><OnboardingProvider>{children}</OnboardingProvider><CookieNotice /></body></html>;
+  return <html lang="es"><body className={`${manrope.variable} ${bethany.variable}`}><UiClickSound /><OnboardingProvider>{children}</OnboardingProvider><CookieNotice /><MetaHomePageView /></body></html>;
 }
