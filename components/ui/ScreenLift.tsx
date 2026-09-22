@@ -9,23 +9,28 @@ export function ScreenLift({
   maxLift,
   safeBottom = 16,
   minFitHeight = 700,
+  respectSafeArea = false,
 }: {
   children: ReactNode;
   contentBottom: number;
   maxLift: number;
   safeBottom?: number;
   minFitHeight?: number;
+  respectSafeArea?: boolean;
 }) {
   const [lift, setLift] = useState(0);
 
   useLayoutEffect(() => {
     function updateLift() {
       const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+      const safeAreaBottom = respectSafeArea
+        ? Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--safe-area-inset-bottom")) || 0
+        : 0;
       setLift(calculateScreenLift({
         viewportWidth: window.innerWidth,
         viewportHeight,
         contentBottom,
-        safeBottom,
+        safeBottom: safeBottom + safeAreaBottom,
         maxLift,
         minFitHeight,
       }));
@@ -38,7 +43,7 @@ export function ScreenLift({
       window.removeEventListener("resize", updateLift);
       window.visualViewport?.removeEventListener("resize", updateLift);
     };
-  }, [contentBottom, maxLift, minFitHeight, safeBottom]);
+  }, [contentBottom, maxLift, minFitHeight, respectSafeArea, safeBottom]);
 
   return <div className="screen-lift" style={{ "--screen-lift": `${-lift}px` } as React.CSSProperties}>{children}</div>;
 }

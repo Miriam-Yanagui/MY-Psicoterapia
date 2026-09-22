@@ -32,8 +32,8 @@ export default function HomePage() {
   const r = !mounted || reduced;
 
   return (
-    <MobileScreen className="f01">
-      <ScreenLift contentBottom={805} maxLift={100}>
+    <MobileScreen className="f01" fitViewport>
+      <ScreenLift contentBottom={805} maxLift={180} minFitHeight={0} respectSafeArea>
       <motion.div
         initial={r ? { opacity: 0 } : { opacity: 0 }}
         animate={{ opacity: 1 }}
