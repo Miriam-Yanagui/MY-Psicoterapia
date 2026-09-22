@@ -62,9 +62,17 @@ export function MetaHomePageView() {
 
     const trackWhenAllowed = () => {
       if (tracked.current || !hasMarketingConsent()) return;
+      const eventId = crypto.randomUUID();
       initializePixel();
-      window.fbq?.("track", "PageView");
+      window.fbq?.("track", "PageView", {}, { eventID: eventId });
       tracked.current = true;
+      void fetch("/api/meta/page-view", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ event_id: eventId }),
+        credentials: "same-origin",
+        keepalive: true,
+      }).catch(() => undefined);
     };
 
     trackWhenAllowed();
