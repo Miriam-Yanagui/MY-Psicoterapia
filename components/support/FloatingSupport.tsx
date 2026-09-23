@@ -32,13 +32,21 @@ export function FloatingSupport() {
   const message = `Hola, necesito ayuda para agendar en MY Psicoterapia. Estoy en la pantalla: ${pathname}`;
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 
+  function openWhatsAppMessenger(event: React.MouseEvent<HTMLAnchorElement>) {
+    if (!/Android/i.test(navigator.userAgent)) return;
+
+    event.preventDefault();
+    const fallback = encodeURIComponent(whatsappUrl);
+    window.location.href = `intent://send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(message)}#Intent;scheme=whatsapp;package=com.whatsapp;S.browser_fallback_url=${fallback};end`;
+  }
+
   return <div className={`floating-support${open ? " floating-support--open" : ""}`} ref={panelRef}>
     {open && <aside className="floating-support-panel" id="floating-support-panel" aria-label="Ayuda para agendar">
       <button className="floating-support-close" type="button" aria-label="Cerrar ayuda" onClick={() => setOpen(false)}>×</button>
       <p className="floating-support-eyebrow">SOPORTE TÉCNICO</p>
       <h2>¿Algo no está funcionando?</h2>
       <p>Escríbenos y cuéntanos en qué parte del proceso necesitas ayuda.</p>
-      <a className="floating-support-whatsapp" href={whatsappUrl} target="_blank" rel="noreferrer">
+      <a className="floating-support-whatsapp" href={whatsappUrl} target="_blank" rel="noreferrer" onClick={openWhatsAppMessenger}>
         <Image src="/assets/whatsapp-icon-48.svg" alt="" width={20} height={20} />
         Abrir WhatsApp
       </a>
