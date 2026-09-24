@@ -53,6 +53,15 @@ export default function CheckoutPage() {
   }, [booking, now]);
   const isExpired = Boolean(booking && booking.status === "held") && remainingMs !== null && remainingMs <= 0;
   const countdown = useMemo(() => formatCountdown(remainingMs ?? 0), [remainingMs]);
+  const updatePaymentConfig = useCallback((current: Awaited<ReturnType<typeof recoverCurrentBooking>>) => {
+    if (!current) return;
+    const nextStatus = current.payment?.status;
+    setPaymentConfig((previous) => {
+      if (previous?.amountMinor === current.amountMinor && previous.currency === current.currency
+          && previous.status === nextStatus) return previous;
+      return { amountMinor: current.amountMinor, currency: current.currency, status: nextStatus };
+    });
+  }, []);
 
   useEffect(() => {
     if (booking || state.bookingRecoveryState === "unavailable") return;
@@ -80,7 +89,7 @@ export default function CheckoutPage() {
             router.replace(routes.confirmation);
             return;
           }
-          setPaymentConfig({ amountMinor: current.amountMinor, currency: current.currency, status: current.payment?.status });
+          updatePaymentConfig(current);
           if (current.consented && current.intake && current.contact?.phone && current.contact?.countryCode
               && (current.status === "held" || current.status === "payment_pending")) setCheckoutStep("payment");
         })
@@ -99,7 +108,7 @@ export default function CheckoutPage() {
     dispatch({ type: "setBookingRecoveryState", state: "recovering" });
     attempt();
     return () => { active = false; if (retryTimer) clearTimeout(retryTimer); };
-  }, [booking, dispatch, router, state.bookingRecoveryState]);
+  }, [booking, dispatch, router, state.bookingRecoveryState, updatePaymentConfig]);
 
   useEffect(() => {
     if (!booking || checkoutStep !== "payment") return;
@@ -120,7 +129,7 @@ export default function CheckoutPage() {
             router.replace(routes.confirmation);
             return;
           }
-          setPaymentConfig({ amountMinor: current.amountMinor, currency: current.currency, status: current.payment?.status });
+          updatePaymentConfig(current);
           pollTimer = setTimeout(poll, 3000);
         })
         .catch((error) => {
@@ -136,7 +145,7 @@ export default function CheckoutPage() {
 
     void poll();
     return () => { active = false; if (pollTimer) clearTimeout(pollTimer); };
-  }, [booking, checkoutStep, dispatch, router]);
+  }, [booking, checkoutStep, dispatch, router, updatePaymentConfig]);
 
   useEffect(() => {
     if (!booking || booking.status === "confirmed") return;
@@ -212,6 +221,11 @@ export default function CheckoutPage() {
     }, 220);
   }, [reduced]);
 
+  const handleBookingUnavailable = useCallback(() => {
+    dispatch({ type: "clearBooking" });
+    router.replace(routes.schedule);
+  }, [dispatch, router]);
+
   async function handleContinue() {
     if (isExpired) {
       dispatch({ type: "clearBooking" });
@@ -230,7 +244,7 @@ export default function CheckoutPage() {
       trackFunnelEvent("contact_saved");
       const current = await recoverCurrentBooking();
       if (!current) throw Object.assign(new Error("BOOKING_NOT_FOUND"), { code: "BOOKING_NOT_FOUND" });
-      setPaymentConfig({ amountMinor: current.amountMinor, currency: current.currency, status: current.payment?.status });
+      updatePaymentConfig(current);
       paymentScrollRequested.current = true;
       setCheckoutStep("payment");
       setContactState("idle");
@@ -268,6 +282,6 @@ export default function CheckoutPage() {
     <Image className="checkout-continue-arrow" src="/assets/f02-arrow-right.png" alt="" width={18} height={18} />
     {contactError && <p className="checkout-privacy" role="alert">{contactError}</p>}
     {!contactError && <p className="checkout-privacy">Usa este mismo correo en el formulario de pago seguro.</p>}
-    {checkoutStep === "payment" && !isExpired && paymentConfig && <PaymentSection {...paymentConfig} sectionRef={paymentSectionRef} onBrickReady={handleBrickReady} onBookingUnavailable={() => { dispatch({ type: "clearBooking" }); router.replace(routes.schedule); }} />}
+    {checkoutStep === "payment" && !isExpired && paymentConfig && <PaymentSection {...paymentConfig} sectionRef={paymentSectionRef} onBrickReady={handleBrickReady} onBookingUnavailable={handleBookingUnavailable} />}
   </main></div>;
 }
