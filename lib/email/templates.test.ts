@@ -24,9 +24,27 @@ describe("transactional email templates", () => {
   });
 
   it("escapes patient data in the practitioner email", () => {
-    const email = practitionerNoticeEmail({ ...appointment, patientEmail: "a<script>@example.com" });
+    const email = practitionerNoticeEmail({
+      ...appointment,
+      patientEmail: "a<script>@example.com",
+      patientPhone: "+525512345678",
+      patientName: "Ana <Paciente>",
+      emotion: "Preocupado/a",
+      therapyExperience: "Primera vez",
+      goals: ["Sentirme con más calma", "Conocerme mejor"],
+      goalsAdditionalNotes: "Necesito <apoyo>",
+      meetUrl: "https://meet.google.com/abc-defg-hij",
+      calendarStatus: "created",
+    });
     expect(email.html).not.toContain("<script>");
     expect(email.html).toContain("a&lt;script&gt;@example.com");
+    expect(email.html).toContain("Ana &lt;Paciente&gt;");
+    expect(email.html).toContain("Necesito &lt;apoyo&gt;");
+    expect(email.html).toContain("Sentirme con más calma");
+    expect(email.html).toContain("https://meet.google.com/abc-defg-hij");
+    expect(email.html).toContain('<html lang="es" dir="ltr">');
+    expect(email.html).toContain("<title>Nueva sesión confirmada.</title>");
     expect(email.text).toContain("a<script>@example.com");
+    expect(email.text).toContain("Preocupado/a");
   });
 });

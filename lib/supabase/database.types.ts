@@ -26,6 +26,12 @@ export type Database = {
         Update: { appointment_id?: string; name?: string; emotion?: string; therapy_experience?: string; goals?: string[]; goals_additional_notes?: string | null; created_at?: string; updated_at?: string }
         Relationships: [{ foreignKeyName: "booking_intake_appointment_id_fkey"; columns: ["appointment_id"]; isOneToOne: true; referencedRelation: "appointments"; referencedColumns: ["id"] }]
       }
+      calendar_outbox: {
+        Row: { id: string; appointment_id: string; status: string; attempts: number; next_attempt_at: string; google_event_id: string | null; meet_url: string | null; last_error: string | null; created_event_at: string | null; created_at: string; updated_at: string }
+        Insert: { id?: string; appointment_id: string; status?: string; attempts?: number; next_attempt_at?: string; google_event_id?: string | null; meet_url?: string | null; last_error?: string | null; created_event_at?: string | null; created_at?: string; updated_at?: string }
+        Update: { id?: string; appointment_id?: string; status?: string; attempts?: number; next_attempt_at?: string; google_event_id?: string | null; meet_url?: string | null; last_error?: string | null; created_event_at?: string | null; created_at?: string; updated_at?: string }
+        Relationships: [{ foreignKeyName: "calendar_outbox_appointment_id_fkey"; columns: ["appointment_id"]; isOneToOne: true; referencedRelation: "appointments"; referencedColumns: ["id"] }]
+      }
       google_oauth_credentials: {
         Row: {
           authorized_email: string

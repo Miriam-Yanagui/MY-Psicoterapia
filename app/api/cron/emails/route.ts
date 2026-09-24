@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { processEmailOutbox } from "@/lib/email/outbox";
+import { processCalendarOutbox } from "@/lib/google/calendar-outbox";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -10,7 +11,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ code: "UNAUTHORIZED" }, { status: 401 });
   }
   try {
-    return NextResponse.json(await processEmailOutbox(10));
+    const calendar = await processCalendarOutbox(10).catch(() => ({ created: 0, failed: 1 }));
+    const email = await processEmailOutbox(10);
+    return NextResponse.json({ calendar, email });
   } catch {
     return NextResponse.json({ code: "EMAIL_WORKER_UNAVAILABLE" }, { status: 503 });
   }

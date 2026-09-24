@@ -14,9 +14,12 @@ type OutboxJob = {
 type AppointmentRow = {
   id: string;
   email: string | null;
+  phone: string | null;
   amount_minor: number;
   currency: string;
   slot: { starts_at: string; timezone: string } | { starts_at: string; timezone: string }[];
+  intake: { name: string; emotion: string; therapy_experience: string; goals: string[]; goals_additional_notes: string | null } | { name: string; emotion: string; therapy_experience: string; goals: string[]; goals_additional_notes: string | null }[] | null;
+  calendar: { status: string; meet_url: string | null } | { status: string; meet_url: string | null }[] | null;
 };
 
 const RESEND_ENDPOINT = "https://api.resend.com/emails";
@@ -61,18 +64,20 @@ export async function processEmailOutbox(limit = 4): Promise<{ sent: number; fai
     try {
       const { data: appointment, error: appointmentError } = await supabase
         .from("appointments")
-        .select("id,email,amount_minor,currency,slot:slots!inner(starts_at,timezone)")
+        .select("id,email,phone,amount_minor,currency,slot:slots!inner(starts_at,timezone),intake:booking_intake(name,emotion,therapy_experience,goals,goals_additional_notes),calendar:calendar_outbox(status,meet_url)")
         .eq("id", job.appointment_id)
         .eq("status", "confirmed")
         .single();
       if (appointmentError) throw appointmentError;
       const row = appointment as unknown as AppointmentRow;
       const slot = Array.isArray(row.slot) ? row.slot[0] : row.slot;
+      const intake = Array.isArray(row.intake) ? row.intake[0] : row.intake;
+      const calendar = Array.isArray(row.calendar) ? row.calendar[0] : row.calendar;
       if (!row.email || !slot) throw new Error("CONFIRMED_APPOINTMENT_INCOMPLETE");
 
       const recipient = job.kind === "patient_confirmation"
         ? job.recipient ?? row.email
-        : process.env.MIRIAM_NOTIFICATION_EMAIL ?? "hola@mypsicoterapia.com";
+        : job.recipient ?? "myterapiacc@gmail.com";
       const email = (job.kind === "patient_confirmation" ? patientConfirmationEmail : practitionerNoticeEmail)({
         appointmentId: row.id,
         startsAt: slot.starts_at,
@@ -80,6 +85,14 @@ export async function processEmailOutbox(limit = 4): Promise<{ sent: number; fai
         amountMinor: row.amount_minor,
         currency: row.currency,
         patientEmail: row.email,
+        patientPhone: row.phone,
+        patientName: intake?.name,
+        emotion: intake?.emotion,
+        therapyExperience: intake?.therapy_experience,
+        goals: intake?.goals,
+        goalsAdditionalNotes: intake?.goals_additional_notes,
+        meetUrl: calendar?.meet_url,
+        calendarStatus: calendar?.status,
       });
 
       const response = await fetch(RESEND_ENDPOINT, {
