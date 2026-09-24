@@ -74,6 +74,9 @@ export async function processEmailOutbox(limit = 4): Promise<{ sent: number; fai
       const intake = Array.isArray(row.intake) ? row.intake[0] : row.intake;
       const calendar = Array.isArray(row.calendar) ? row.calendar[0] : row.calendar;
       if (!row.email || !slot) throw new Error("CONFIRMED_APPOINTMENT_INCOMPLETE");
+      if (calendar?.status !== "created" || !calendar.meet_url) {
+        throw new Error(`CALENDAR_NOT_READY_${calendar?.status ?? "missing"}`);
+      }
 
       const recipient = job.kind === "patient_confirmation"
         ? job.recipient ?? row.email
@@ -91,8 +94,7 @@ export async function processEmailOutbox(limit = 4): Promise<{ sent: number; fai
         therapyExperience: intake?.therapy_experience,
         goals: intake?.goals,
         goalsAdditionalNotes: intake?.goals_additional_notes,
-        meetUrl: calendar?.meet_url,
-        calendarStatus: calendar?.status,
+        meetUrl: calendar.meet_url,
       });
 
       const response = await fetch(RESEND_ENDPOINT, {
