@@ -12,7 +12,7 @@ export type HoldSuccess = {
 
 export type HoldUnavailable = {
   status: "unavailable";
-  code: "SLOT_UNAVAILABLE" | "SLOT_NOT_OPEN" | "SLOT_NOT_FOUND" | "HOLD_EXPIRED";
+  code: "SLOT_UNAVAILABLE" | "SLOT_NOT_OPEN" | "SLOT_NOT_FOUND" | "SLOT_TOO_SOON" | "HOLD_EXPIRED";
 };
 
 export type HoldResult = HoldSuccess | HoldUnavailable;
