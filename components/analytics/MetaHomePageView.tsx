@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { routes } from "@/lib/flow";
+import { isTrackingOptedOut } from "@/lib/funnel-analytics";
 
 const PIXEL_ID = "2655379324882292";
 const CONSENT_KEY = "miriam_cookie_consent_v2";
@@ -23,6 +24,7 @@ declare global {
 }
 
 function hasMarketingConsent() {
+  if (isTrackingOptedOut()) return false;
   try {
     return JSON.parse(localStorage.getItem(CONSENT_KEY) || "null")?.marketing === true;
   } catch {

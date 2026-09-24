@@ -4,6 +4,7 @@ import { OnboardingProvider } from "@/context/OnboardingProvider";
 import { UiClickSound } from "@/components/ui/UiClickSound";
 import { CookieNotice } from "@/components/legal/CookieNotice";
 import { MetaHomePageView } from "@/components/analytics/MetaHomePageView";
+import { FunnelTracker } from "@/components/analytics/FunnelTracker";
 import { FloatingSupport } from "@/components/support/FloatingSupport";
 import { LANDING_DESCRIPTION, LANDING_TITLE, SITE_URL } from "@/lib/seo";
 import "./globals.css";
@@ -30,5 +31,5 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="es"><body className={`${manrope.variable} ${bethany.variable}`}><UiClickSound /><OnboardingProvider>{children}</OnboardingProvider><FloatingSupport /><CookieNotice /><MetaHomePageView /></body></html>;
+  return <html lang="es"><body className={`${manrope.variable} ${bethany.variable}`}><UiClickSound /><OnboardingProvider>{children}</OnboardingProvider><FloatingSupport /><CookieNotice /><FunnelTracker /><MetaHomePageView /></body></html>;
 }

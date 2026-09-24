@@ -4,6 +4,7 @@ import { CardPayment, initMercadoPago } from "@mercadopago/sdk-react";
 import { useCallback, useMemo, useRef, useState, type Ref } from "react";
 import { submitCardPayment, type SafePaymentStatus } from "@/lib/payment";
 import { createUuid } from "@/lib/uuid";
+import { trackFunnelEvent } from "@/lib/funnel-analytics";
 
 const publicKey = process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY;
 if (publicKey) initMercadoPago(publicKey, { locale: "es-MX" });
@@ -27,6 +28,7 @@ export function PaymentSection({ amountMinor, currency, status: initialStatus, o
   const displayedStatus = initialStatus === "approved" ? "approved" : status ?? initialStatus;
   const handleSubmit = useCallback(async (form: { token: string; payment_method_id: string; installments: number; payer?: { email?: string } }, additional?: { paymentTypeId?: string }) => {
     setError(null); setStatus("processing");
+    trackFunnelEvent("payment_started");
     try {
       const result = await submitCardPayment({ token: form.token, paymentMethodId: form.payment_method_id,
         paymentTypeId: additional?.paymentTypeId === "debit_card" || additional?.paymentTypeId === "prepaid_card" ? additional.paymentTypeId : "credit_card",
@@ -49,7 +51,7 @@ export function PaymentSection({ amountMinor, currency, status: initialStatus, o
       setError("No pudimos comprobar el resultado. Reintenta; no crearemos un cobro nuevo.");
       setStatus("processing");
     }
-  }, []);
+  }, [onBookingUnavailable]);
   const handleError = useCallback(() => setError("No pudimos cargar el formulario seguro de Mercado Pago."), []);
 
   return <section ref={sectionRef} className="checkout-payment-flow" aria-label="Pago seguro con Mercado Pago">

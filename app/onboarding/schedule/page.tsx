@@ -17,6 +17,7 @@ import { createBookingHold } from "@/lib/booking";
 import { scheduleCalendarFixture } from "@/lib/mockAvailability";
 import { routes } from "@/lib/flow";
 import { createUuid } from "@/lib/uuid";
+import { trackFunnelEvent } from "@/lib/funnel-analytics";
 
 type HoldUiState = "idle" | "pending" | "error";
 
@@ -61,7 +62,7 @@ export default function SchedulePage() {
   const cacheRef = useRef<Map<string, AvailabilitySlot[]>>(new Map());
   const abortRef = useRef<AbortController | null>(null);
 
-  const currentMonth = useMemo(getCurrentMonth, []);
+  const currentMonth = useMemo(() => getCurrentMonth(), []);
   const minMonth = currentMonth;
   const maxMonth = useMemo(() => addMonths(currentMonth.year, currentMonth.month, 2), [currentMonth]);
 
@@ -213,6 +214,7 @@ export default function SchedulePage() {
           currency: result.currency,
         },
       });
+      trackFunnelEvent("hold_created");
 
       idempotencyKeyRef.current = null;
       pendingSlotIdRef.current = null;
