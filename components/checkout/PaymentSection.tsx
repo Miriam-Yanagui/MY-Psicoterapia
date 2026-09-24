@@ -1,7 +1,7 @@
 "use client";
 
 import { CardPayment, initMercadoPago } from "@mercadopago/sdk-react";
-import { useCallback, useMemo, useRef, useState, type Ref } from "react";
+import { memo, useCallback, useMemo, useRef, useState, type Ref } from "react";
 import { submitCardPayment, type SafePaymentStatus } from "@/lib/payment";
 import { createUuid } from "@/lib/uuid";
 import { trackFunnelEvent } from "@/lib/funnel-analytics";
@@ -17,7 +17,7 @@ const statusCopy: Record<SafePaymentStatus, string> = {
   rejected: "El pago fue rechazado. Puedes intentarlo nuevamente mientras tu reserva siga vigente.",
 };
 
-export function PaymentSection({ amountMinor, currency, status: initialStatus, onBookingUnavailable, onBrickReady, sectionRef }: {
+export const PaymentSection = memo(function PaymentSection({ amountMinor, currency, status: initialStatus, onBookingUnavailable, onBrickReady, sectionRef }: {
   amountMinor: number; currency: "MXN"; status?: SafePaymentStatus; onBookingUnavailable?: () => void; onBrickReady?: () => void; sectionRef?: Ref<HTMLElement>;
 }) {
   const [status, setStatus] = useState<SafePaymentStatus | undefined>(initialStatus);
@@ -65,4 +65,4 @@ export function PaymentSection({ amountMinor, currency, status: initialStatus, o
       <p className="checkout-security">Pago de ${(amountMinor / 100).toFixed(0)} {currency} procesado por Mercado Pago</p>
     </div>
   </section>;
-}
+});
