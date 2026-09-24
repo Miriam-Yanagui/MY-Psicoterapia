@@ -14,6 +14,7 @@ type GoogleEvent = { id?: string; hangoutLink?: string; conferenceData?: { entry
 
 const GOOGLE_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
 const GOOGLE_CALENDAR_ENDPOINT = "https://www.googleapis.com/calendar/v3/calendars/primary/events";
+const PRACTITIONER_CALENDAR_EMAIL = "myterapiacc@gmail.com";
 
 function retryDelayMinutes(attempts: number): number {
   return Math.min(60, 2 ** Math.max(0, attempts - 1));
@@ -33,7 +34,10 @@ export function calendarEventBody(appointment: CalendarAppointment) {
     description: `Reservación ${appointment.id.replace(/-/g, "").slice(0, 10).toUpperCase()} confirmada en MY Psicoterapia.`,
     start: { dateTime: slot.starts_at, timeZone: slot.timezone },
     end: { dateTime: slot.ends_at, timeZone: slot.timezone },
-    attendees: [{ email: appointment.email }],
+    attendees: [{ email: appointment.email }, { email: PRACTITIONER_CALENDAR_EMAIL }],
+    guestsCanInviteOthers: false,
+    guestsCanModify: false,
+    guestsCanSeeOtherGuests: false,
     conferenceData: { createRequest: { requestId: eventId, conferenceSolutionKey: { type: "hangoutsMeet" } } },
     extendedProperties: { private: { appointmentId: appointment.id } },
     reminders: { useDefault: true },

@@ -19,7 +19,10 @@ describe("Google Calendar event", () => {
       summary: "Sesión privada · MY Psicoterapia",
       start: { dateTime: "2026-10-01T18:00:00Z", timeZone: "America/Mexico_City" },
       end: { dateTime: "2026-10-01T18:50:00Z", timeZone: "America/Mexico_City" },
-      attendees: [{ email: "persona@example.com" }],
+      attendees: [{ email: "persona@example.com" }, { email: "myterapiacc@gmail.com" }],
+      guestsCanInviteOthers: false,
+      guestsCanModify: false,
+      guestsCanSeeOtherGuests: false,
       conferenceData: { createRequest: { conferenceSolutionKey: { type: "hangoutsMeet" } } },
     });
   });
