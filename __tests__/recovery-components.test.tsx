@@ -137,6 +137,7 @@ describe("CheckoutPage F11 — null", () => {
     const heldWithContact = fakeBooking({
       contact: { email: "ana@example.com", countryCode: "+52", phone: "5512345678", consented: true },
       consented: true,
+      intake: { name: "Ana", emotion: "Bien", therapyExperience: "Primera vez", goals: ["Conocerme mejor"], goalsAdditionalNotes: "" },
     });
     mockRecoverCurrentBooking
       .mockResolvedValueOnce(heldWithContact)

@@ -39,6 +39,13 @@ export function PaymentSection({ amountMinor, currency, status: initialStatus, o
         onBookingUnavailable?.();
         return;
       }
+      if (code === "CONTACT_REQUIRED" || code === "INTAKE_REQUIRED") {
+        setError(code === "CONTACT_REQUIRED"
+          ? "Usa el mismo correo que guardaste para tu reserva. Si necesitas corregir tus datos, vuelve a cargar esta página."
+          : "Faltan respuestas de tu reserva. Vuelve a cargar esta página para completarlas antes de pagar.");
+        setStatus(undefined);
+        return;
+      }
       setError("No pudimos comprobar el resultado. Reintenta; no crearemos un cobro nuevo.");
       setStatus("processing");
     }

@@ -64,6 +64,7 @@ export type OnboardingAction =
       booking: BookingHold;
       appointment: { date: string; time: string };
       contact: OnboardingState["contact"] | null;
+      intake: Pick<OnboardingState, "name" | "emotion" | "therapyExperience" | "goals" | "goalsAdditionalNotes"> | null;
     }
   | { type: "setBookingRecoveryState"; state: BookingRecoveryState }
   | { type: "clearBooking" }
