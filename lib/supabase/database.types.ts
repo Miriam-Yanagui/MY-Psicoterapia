@@ -14,6 +14,12 @@ export type Database = {
   }
   public: {
     Tables: {
+      booking_funnel_events: {
+        Row: { id: number; session_hash: string; event_name: string; path: string; created_at: string }
+        Insert: { id?: never; session_hash: string; event_name: string; path: string; created_at?: string }
+        Update: { id?: never; session_hash?: string; event_name?: string; path?: string; created_at?: string }
+        Relationships: []
+      }
       booking_intake: {
         Row: { appointment_id: string; name: string; emotion: string; therapy_experience: string; goals: string[]; goals_additional_notes: string | null; created_at: string; updated_at: string }
         Insert: { appointment_id: string; name: string; emotion: string; therapy_experience: string; goals: string[]; goals_additional_notes?: string | null; created_at?: string; updated_at?: string }

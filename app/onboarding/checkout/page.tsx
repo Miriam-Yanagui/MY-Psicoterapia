@@ -9,6 +9,7 @@ import { PaymentSection } from "@/components/checkout/PaymentSection";
 import { useOnboarding } from "@/context/OnboardingProvider";
 import { recoverCurrentBooking, recoveredBookingState, saveBookingContact, isTemporaryBookingFailure } from "@/lib/booking";
 import { saveBookingIntake } from "@/lib/intake";
+import { trackFunnelEvent } from "@/lib/funnel-analytics";
 import { routes } from "@/lib/flow";
 import { isAuthoritativelyConfirmed } from "@/lib/confirmation";
 import { useReducedMotion } from "@/lib/motion";
@@ -38,6 +39,7 @@ export default function CheckoutPage() {
   const checkoutStageRef = useRef<HTMLDivElement>(null);
   const scrollFrameRef = useRef<number | null>(null);
   const scrollDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const revealStartedRef = useRef(false);
 
   const contactValid = state.contact.consent && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.contact.email.trim())
     && /^\+[1-9]\d{0,3}$/.test(state.contact.countryCode.trim()) && /^\d{7,14}$/.test(state.contact.phone.replace(/\D/g, ""));
@@ -97,7 +99,7 @@ export default function CheckoutPage() {
     dispatch({ type: "setBookingRecoveryState", state: "recovering" });
     attempt();
     return () => { active = false; if (retryTimer) clearTimeout(retryTimer); };
-  }, [booking, dispatch, router]);
+  }, [booking, dispatch, router, state.bookingRecoveryState]);
 
   useEffect(() => {
     if (!booking || checkoutStep !== "payment") return;
@@ -147,6 +149,37 @@ export default function CheckoutPage() {
     if (scrollDelayRef.current !== null) clearTimeout(scrollDelayRef.current);
   }, []);
 
+  useEffect(() => {
+    const stage = checkoutStageRef.current;
+    if (!stage || !booking || checkoutStep !== "details" || reduced || revealStartedRef.current) return;
+    revealStartedRef.current = true;
+    let frame: number | null = null;
+    let cancelled = false;
+    const cancel = () => { cancelled = true; if (frame !== null) cancelAnimationFrame(frame); };
+    const events: Array<keyof HTMLElementEventMap> = ["wheel", "touchstart", "pointerdown", "keydown"];
+    events.forEach((event) => stage.addEventListener(event, cancel, { once: true, passive: true }));
+    const timer = window.setTimeout(() => {
+      const start = stage.scrollTop;
+      const destination = Math.max(0, stage.scrollHeight - stage.clientHeight);
+      const distance = destination - start;
+      const duration = 2800;
+      const startedAt = performance.now();
+      function reveal(timestamp: number) {
+        if (cancelled) return;
+        const progress = Math.min(1, (timestamp - startedAt) / duration);
+        const eased = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+        stage!.scrollTop = start + distance * eased;
+        if (progress < 1) frame = requestAnimationFrame(reveal);
+      }
+      if (distance > 8) frame = requestAnimationFrame(reveal);
+    }, 900);
+    return () => {
+      window.clearTimeout(timer);
+      cancel();
+      events.forEach((event) => stage.removeEventListener(event, cancel));
+    };
+  }, [booking, checkoutStep, reduced]);
+
   const handleBrickReady = useCallback(() => {
     if (!paymentScrollRequested.current) return;
     paymentScrollRequested.current = false;
@@ -194,6 +227,7 @@ export default function CheckoutPage() {
         goals: state.goals, goalsAdditionalNotes: state.goalsAdditionalNotes });
       await saveBookingContact({ email: state.contact.email, countryCode: state.contact.countryCode,
         phone: state.contact.phone, consented: state.contact.consent });
+      trackFunnelEvent("contact_saved");
       const current = await recoverCurrentBooking();
       if (!current) throw Object.assign(new Error("BOOKING_NOT_FOUND"), { code: "BOOKING_NOT_FOUND" });
       setPaymentConfig({ amountMinor: current.amountMinor, currency: current.currency, status: current.payment?.status });
