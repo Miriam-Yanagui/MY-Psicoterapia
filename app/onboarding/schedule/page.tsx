@@ -224,7 +224,7 @@ export default function SchedulePage() {
       const code = error instanceof Error && "code" in error ? String((error as { code: string }).code) : "HOLD_UNAVAILABLE";
       const status = error instanceof Error && "status" in error ? Number((error as { status: number }).status) : 0;
 
-      if (status === 409 || code === "SLOT_UNAVAILABLE" || code === "SLOT_NOT_OPEN" || code === "SLOT_NOT_FOUND" || code === "HOLD_EXPIRED") {
+      if (status === 409 || code === "SLOT_UNAVAILABLE" || code === "SLOT_NOT_OPEN" || code === "SLOT_NOT_FOUND" || code === "SLOT_TOO_SOON" || code === "HOLD_EXPIRED") {
         setHoldError("Ese horario ya fue tomado. Elige otro.");
         idempotencyKeyRef.current = null;
         pendingSlotIdRef.current = null;

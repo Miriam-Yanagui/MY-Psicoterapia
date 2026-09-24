@@ -9,6 +9,7 @@ const UNAVAILABLE_CODES = new Set([
   "SLOT_UNAVAILABLE",
   "SLOT_NOT_OPEN",
   "SLOT_NOT_FOUND",
+  "SLOT_TOO_SOON",
   "HOLD_EXPIRED",
 ]);
 

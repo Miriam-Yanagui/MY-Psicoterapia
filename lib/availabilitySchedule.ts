@@ -3,6 +3,7 @@ import type { Database } from "@/lib/supabase/database.types";
 export const AVAILABILITY_TIMEZONE = "America/Mexico_City";
 const MEXICO_CITY_OFFSET = "-06:00";
 const ROLLING_DAYS = 60;
+export const BOOKING_LEAD_TIME_MS = 24 * 60 * 60 * 1000;
 const WEEKDAY_START_HOURS = [9, 10, 11, 12, 13, 14, 15, 16, 17] as const;
 const SATURDAY_START_HOURS = [11, 12] as const;
 
@@ -43,7 +44,7 @@ export function getRollingAvailabilityWindow(now = new Date()) {
   const today = datePartsInMexicoCity(now);
   const endDate = addDays(today, ROLLING_DAYS);
   return {
-    from: now.toISOString(),
+    from: new Date(now.getTime() + BOOKING_LEAD_TIME_MS).toISOString(),
     to: slotIso(localDateString(endDate.year, endDate.month, endDate.day), 0, 0),
   };
 }
@@ -59,7 +60,7 @@ export function buildRollingAvailability({
 }): SlotInsert[] {
   const requestedFrom = new Date(from).getTime();
   const requestedTo = new Date(to).getTime();
-  const nowTime = now.getTime();
+  const earliestStartTime = now.getTime() + BOOKING_LEAD_TIME_MS;
   const today = datePartsInMexicoCity(now);
   const slots: SlotInsert[] = [];
 
@@ -70,7 +71,7 @@ export function buildRollingAvailability({
       const startsAt = slotIso(localDate, hour, 0);
       const endsAt = slotIso(localDate, hour, 50);
       const startTime = new Date(startsAt).getTime();
-      if (startTime <= nowTime || startTime < requestedFrom || startTime >= requestedTo) continue;
+      if (startTime < earliestStartTime || startTime < requestedFrom || startTime >= requestedTo) continue;
       slots.push({
         starts_at: startsAt,
         ends_at: endsAt,
