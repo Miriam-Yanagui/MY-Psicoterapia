@@ -51,6 +51,11 @@ export function reducer(state: OnboardingState, action: OnboardingAction): Onboa
       booking: action.booking,
       appointment: action.appointment,
       contact: action.contact ?? state.contact,
+      name: action.intake?.name ?? state.name,
+      emotion: action.intake?.emotion ?? state.emotion,
+      therapyExperience: action.intake?.therapyExperience ?? state.therapyExperience,
+      goals: action.intake?.goals ?? state.goals,
+      goalsAdditionalNotes: action.intake?.goalsAdditionalNotes ?? state.goalsAdditionalNotes,
       bookingRecoveryState: "ready",
     };
     case "setBookingRecoveryState": return { ...state, bookingRecoveryState: action.state };

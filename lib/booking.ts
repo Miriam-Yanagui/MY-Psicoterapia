@@ -29,6 +29,7 @@ export type CurrentBooking = {
   holdExpiresAt: string | null;
   slot: { id: string; startsAt: string; endsAt: string; timezone: string };
   contact: { email: string; countryCode: string; phone: string; consented: boolean } | null;
+  intake?: { name: string; emotion: import("@/lib/types").Emotion; therapyExperience: import("@/lib/types").TherapyExperience; goals: import("@/lib/types").Goal[]; goalsAdditionalNotes: string } | null;
   consented: boolean;
   amountMinor: number;
   currency: "MXN";
@@ -147,6 +148,7 @@ export function recoveredBookingState(current: CurrentBooking) {
           consent: current.contact.consented,
         }
       : null,
+    intake: current.intake ?? null,
   };
 }
 

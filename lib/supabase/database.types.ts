@@ -14,6 +14,12 @@ export type Database = {
   }
   public: {
     Tables: {
+      booking_intake: {
+        Row: { appointment_id: string; name: string; emotion: string; therapy_experience: string; goals: string[]; goals_additional_notes: string | null; created_at: string; updated_at: string }
+        Insert: { appointment_id: string; name: string; emotion: string; therapy_experience: string; goals: string[]; goals_additional_notes?: string | null; created_at?: string; updated_at?: string }
+        Update: { appointment_id?: string; name?: string; emotion?: string; therapy_experience?: string; goals?: string[]; goals_additional_notes?: string | null; created_at?: string; updated_at?: string }
+        Relationships: [{ foreignKeyName: "booking_intake_appointment_id_fkey"; columns: ["appointment_id"]; isOneToOne: true; referencedRelation: "appointments"; referencedColumns: ["id"] }]
+      }
       google_oauth_credentials: {
         Row: {
           authorized_email: string
@@ -198,6 +204,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      save_booking_intake: {
+        Args: { p_booking_access_token_hash: string; p_name: string; p_emotion: string; p_therapy_experience: string; p_goals: string[]; p_goals_additional_notes: string | null }
+        Returns: { result_status: string; result_code: string | null }[]
+      }
       acquire_booking_hold: {
         Args: {
           p_booking_access_token_hash: string

@@ -7,7 +7,8 @@ import { AppointmentSummary } from "@/components/checkout/AppointmentSummary";
 import { ConsentField } from "@/components/checkout/ConsentField";
 import { PaymentSection } from "@/components/checkout/PaymentSection";
 import { useOnboarding } from "@/context/OnboardingProvider";
-import { recoverCurrentBooking, recoveredBookingState, saveBookingConsent, isTemporaryBookingFailure } from "@/lib/booking";
+import { recoverCurrentBooking, recoveredBookingState, saveBookingContact, isTemporaryBookingFailure } from "@/lib/booking";
+import { saveBookingIntake } from "@/lib/intake";
 import { routes } from "@/lib/flow";
 import { isAuthoritativelyConfirmed } from "@/lib/confirmation";
 import { useReducedMotion } from "@/lib/motion";
@@ -38,7 +39,8 @@ export default function CheckoutPage() {
   const scrollFrameRef = useRef<number | null>(null);
   const scrollDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const contactValid = state.contact.consent;
+  const contactValid = state.contact.consent && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.contact.email.trim())
+    && /^\+[1-9]\d{0,3}$/.test(state.contact.countryCode.trim()) && /^\d{7,14}$/.test(state.contact.phone.replace(/\D/g, ""));
   const date = state.appointment?.date ?? null;
   const time = state.appointment?.time ?? null;
 
@@ -68,12 +70,17 @@ export default function CheckoutPage() {
             return;
           }
           dispatch({ type: "restoreBooking", ...recoveredBookingState(current) });
+          if (!current.intake) {
+            router.replace(routes.name);
+            return;
+          }
           if (isAuthoritativelyConfirmed(current)) {
             router.replace(routes.confirmation);
             return;
           }
           setPaymentConfig({ amountMinor: current.amountMinor, currency: current.currency, status: current.payment?.status });
-          if (current.consented && (current.status === "held" || current.status === "payment_pending")) setCheckoutStep("payment");
+          if (current.consented && current.intake && current.contact?.phone && current.contact?.countryCode
+              && (current.status === "held" || current.status === "payment_pending")) setCheckoutStep("payment");
         })
         .catch((error) => {
           if (!active) return;
@@ -183,7 +190,10 @@ export default function CheckoutPage() {
     setContactState("saving");
     setContactError(null);
     try {
-      await saveBookingConsent(state.contact.consent);
+      await saveBookingIntake({ name: state.name, emotion: state.emotion!, therapyExperience: state.therapyExperience!,
+        goals: state.goals, goalsAdditionalNotes: state.goalsAdditionalNotes });
+      await saveBookingContact({ email: state.contact.email, countryCode: state.contact.countryCode,
+        phone: state.contact.phone, consented: state.contact.consent });
       const current = await recoverCurrentBooking();
       if (!current) throw Object.assign(new Error("BOOKING_NOT_FOUND"), { code: "BOOKING_NOT_FOUND" });
       setPaymentConfig({ amountMinor: current.amountMinor, currency: current.currency, status: current.payment?.status });
@@ -214,11 +224,16 @@ export default function CheckoutPage() {
     <div className="checkout-orange-pattern" aria-hidden="true" />
     <p className={`checkout-timer${isExpired ? " checkout-timer--expired" : ""}`}><span>{isExpired ? "Tu reserva expiró · 00:00" : <>Tu horario está reservado durante <strong>{countdown}</strong>.</>}</span></p>
     <AppointmentSummary date={date} time={time} appointmentId={booking.appointmentId} amountMinor={booking.amountMinor} currency={booking.currency} />
+    {checkoutStep === "details" && <div className="checkout-contact-fields">
+      <label>Correo electrónico<input type="email" autoComplete="email" value={state.contact.email} onChange={(event) => dispatch({ type: "setContactEmail", email: event.target.value })} /></label>
+      <label>Código de país<input type="tel" autoComplete="tel-country-code" value={state.contact.countryCode} onChange={(event) => dispatch({ type: "setContactCountryCode", countryCode: event.target.value })} /></label>
+      <label>Teléfono<input type="tel" autoComplete="tel-national" value={state.contact.phone} onChange={(event) => dispatch({ type: "setContactPhone", phone: event.target.value })} /></label>
+    </div>}
     <ConsentField checked={state.contact.consent} onChange={(consent) => dispatch({ type: "setContactConsent", consent })} />
     <button className="checkout-continue" type="button" disabled={!isExpired && (!contactValid || contactState === "saving")} onClick={() => void handleContinue()}>{isExpired ? "Elegir otro horario" : contactState === "saving" ? "Guardando…" : "Continuar al pago"}</button>
     <Image className="checkout-continue-arrow" src="/assets/f02-arrow-right.png" alt="" width={18} height={18} />
     {contactError && <p className="checkout-privacy" role="alert">{contactError}</p>}
-    {!contactError && <p className="checkout-privacy">El correo para tu confirmación se solicitará dentro del pago seguro.</p>}
+    {!contactError && <p className="checkout-privacy">Usa este mismo correo en el formulario de pago seguro.</p>}
     {checkoutStep === "payment" && !isExpired && paymentConfig && <PaymentSection {...paymentConfig} sectionRef={paymentSectionRef} onBrickReady={handleBrickReady} onBookingUnavailable={() => { dispatch({ type: "clearBooking" }); router.replace(routes.schedule); }} />}
   </main></div>;
 }

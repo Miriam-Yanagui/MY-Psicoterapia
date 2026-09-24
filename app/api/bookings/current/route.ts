@@ -54,6 +54,10 @@ export async function GET(request: NextRequest) {
       .select("id,status,provider_order_id").eq("appointment_id", data.id)
       .order("created_at", { ascending: false }).limit(1).maybeSingle();
     if (paymentError) throw paymentError;
+    const { data: intake, error: intakeError } = await supabase.from("booking_intake")
+      .select("name,emotion,therapy_experience,goals,goals_additional_notes")
+      .eq("appointment_id", data.id).maybeSingle();
+    if (intakeError) throw intakeError;
     let latestPayment = initialPayment;
 
     if (latestPayment?.status === "approved_provisional" && latestPayment.provider_order_id) {
@@ -98,6 +102,8 @@ export async function GET(request: NextRequest) {
           }
         : null,
       consented: Boolean(data.consented_at),
+      intake: intake ? { name: intake.name, emotion: intake.emotion, therapyExperience: intake.therapy_experience,
+        goals: intake.goals, goalsAdditionalNotes: intake.goals_additional_notes ?? "" } : null,
       amountMinor: data.amount_minor,
       currency: data.currency,
       payment: latestPayment ? {
