@@ -8,6 +8,7 @@ const appointment = {
   amountMinor: 80000,
   currency: "MXN",
   patientEmail: "persona@example.com",
+  meetUrl: "https://meet.google.com/xyz-abcd-efg",
 };
 
 describe("transactional email templates", () => {
@@ -20,6 +21,10 @@ describe("transactional email templates", () => {
     expect(email.html).toContain("Firmar acuerdo de psicoterapia");
     expect(email.html).toContain("jotform.com/es/sign/262517214446051");
     expect(email.text).toContain("Google Meet · 50 minutos");
+    expect(email.html).toContain("https://meet.google.com/xyz-abcd-efg");
+    expect(email.html).toContain("/aviso-de-privacidad");
+    expect(email.html).toContain("/terminos");
+    expect(email.text).toContain("Aviso de privacidad:");
     expect(email.text).toContain("jotform.com/es/sign/262517214446051");
   });
 
@@ -34,7 +39,6 @@ describe("transactional email templates", () => {
       goals: ["Sentirme con más calma", "Conocerme mejor"],
       goalsAdditionalNotes: "Necesito <apoyo>",
       meetUrl: "https://meet.google.com/abc-defg-hij",
-      calendarStatus: "created",
     });
     expect(email.html).not.toContain("<script>");
     expect(email.html).toContain("a&lt;script&gt;@example.com");

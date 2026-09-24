@@ -68,6 +68,20 @@ function meetUrl(event: GoogleEvent): string | null {
     ?? null;
 }
 
+async function eventWithMeet(token: string, eventId: string, initial?: GoogleEvent): Promise<GoogleEvent> {
+  let event = initial;
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    if (event?.id && meetUrl(event)) return event;
+    if (attempt > 0) await new Promise((resolve) => setTimeout(resolve, attempt * 400));
+    const response = await fetch(`${GOOGLE_CALENDAR_ENDPOINT}/${eventId}?conferenceDataVersion=1`, {
+      headers: { Authorization: `Bearer ${token}` }, cache: "no-store",
+    });
+    event = await response.json().catch(() => null) as GoogleEvent | undefined;
+    if (!response.ok || !event?.id) throw new Error(`GOOGLE_EVENT_RECOVERY_${response.status}`);
+  }
+  return event!;
+}
+
 async function createOrRecoverEvent(token: string, appointment: CalendarAppointment): Promise<{ eventId: string; meetUrl: string | null }> {
   const eventId = eventIdForAppointment(appointment.id);
   const endpoint = `${GOOGLE_CALENDAR_ENDPOINT}?conferenceDataVersion=1&sendUpdates=all`;
@@ -78,16 +92,13 @@ async function createOrRecoverEvent(token: string, appointment: CalendarAppointm
     cache: "no-store",
   });
   if (response.status === 409) {
-    const existing = await fetch(`${GOOGLE_CALENDAR_ENDPOINT}/${eventId}?conferenceDataVersion=1`, {
-      headers: { Authorization: `Bearer ${token}` }, cache: "no-store",
-    });
-    const event = await existing.json().catch(() => null) as GoogleEvent | null;
-    if (!existing.ok || !event?.id) throw new Error(`GOOGLE_EVENT_RECOVERY_${existing.status}`);
-    return { eventId: event.id, meetUrl: meetUrl(event) };
+    const event = await eventWithMeet(token, eventId);
+    return { eventId: event.id!, meetUrl: meetUrl(event) };
   }
   const event = await response.json().catch(() => null) as (GoogleEvent & { error?: { message?: string } }) | null;
   if (!response.ok || !event?.id) throw new Error(`GOOGLE_EVENT_${response.status}_${event?.error?.message ?? "UNKNOWN"}`);
-  return { eventId: event.id, meetUrl: meetUrl(event) };
+  const completed = await eventWithMeet(token, eventId, event);
+  return { eventId: completed.id!, meetUrl: meetUrl(completed) };
 }
 
 export async function processCalendarOutbox(limit = 4): Promise<{ created: number; failed: number }> {
@@ -141,10 +152,14 @@ export async function processCalendarOutbox(limit = 4): Promise<{ created: numbe
         .eq("id", job.appointment_id).eq("status", "confirmed").single();
       if (appointmentError) throw appointmentError;
       const event = await createOrRecoverEvent(token, appointment as unknown as CalendarAppointment);
+      if (!event.meetUrl) throw new Error("GOOGLE_MEET_PENDING");
       await supabase.from("calendar_outbox").update({
         status: "created", google_event_id: event.eventId, meet_url: event.meetUrl,
         created_event_at: new Date().toISOString(), last_error: null,
       }).eq("id", job.id);
+      await supabase.from("email_outbox").update({
+        status: "pending", next_attempt_at: new Date().toISOString(), last_error: null,
+      }).eq("appointment_id", job.appointment_id).like("last_error", "CALENDAR_NOT_READY_%");
       created += 1;
     } catch (calendarError) {
       const terminal = job.attempts >= 6;
